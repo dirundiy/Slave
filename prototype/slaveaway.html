@@ -1,0 +1,1586 @@
+<title>slaveaway.</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Anton&family=Bodoni+Moda:ital,opsz,wght@0,6..96,400..700;1,6..96,400..700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=DM+Mono:ital,wght@0,300;0,400;0,500;1,400&family=Fraunces:ital,opsz,wght@0,9..144,400..700;1,9..144,400..700&family=IM+Fell+English:ital@0;1&family=Instrument+Serif:ital@0;1&family=Pinyon+Script&family=Playfair+Display:ital,wght@0,400..800;1,400..800&family=Special+Elite&family=Syne:wght@500..800&display=swap">
+
+<script src="https://cdn.tailwindcss.com/3.4.17"></script>
+<script>
+  tailwind.config = {
+    theme: { extend: {
+      colors: {
+        ink: 'rgb(var(--ink) / <alpha-value>)', wine: 'rgb(var(--wine) / <alpha-value>)',
+        cherry: 'rgb(var(--cherry) / <alpha-value>)', rose: 'rgb(var(--rose) / <alpha-value>)',
+        petal: 'rgb(var(--petal) / <alpha-value>)', cream: 'rgb(var(--cream) / <alpha-value>)'
+      },
+      fontFamily: {
+        display: ['"Instrument Serif"', 'Georgia', 'serif'],
+        body: ['"Cormorant Garamond"', 'Georgia', 'serif'],
+        mono: ['"DM Mono"', 'ui-monospace', 'Menlo', 'monospace'],
+        script: ['"Pinyon Script"', 'cursive']
+      }
+    } }
+  };
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/framer-motion@10.18.0/dist/framer-motion.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+<style>
+/* Layout: three columns — focus | the record | study companion. One dark world, committed on purpose. */
+:root{
+  --ink: 11 9 10;        /* #0B090A */
+  --wine: 53 10 19;      /* #350A13 */
+  --cherry: 101 13 27;   /* #650D1B */
+  --rose: 163 58 73;     /* #A33A49 */
+  --petal: 214 138 150;  /* lighter tint of rose, for small text on ink */
+  --cream: 234 224 213;  /* #EAE0D5 */
+  --f-display: "Instrument Serif", "Cormorant Garamond", Georgia, serif;
+  --f-body: "Cormorant Garamond", Georgia, serif;
+  --f-mono: "DM Mono", ui-monospace, Menlo, Consolas, monospace;
+  --f-script: "Pinyon Script", "Snell Roundhand", cursive;
+  --ease: cubic-bezier(.22,.61,.36,1);
+  color-scheme: dark;
+}
+html,body{min-height:100%}
+body{
+  margin:0;
+  background:
+    radial-gradient(1100px 620px at 50% 18%, rgb(var(--wine) / .55), transparent 70%),
+    radial-gradient(700px 500px at 100% 100%, rgb(var(--wine) / .35), transparent 70%),
+    rgb(var(--ink));
+  background-attachment: fixed;
+  color: rgb(var(--cream));
+  font-family: var(--f-body);
+  font-size: 18px;
+  -webkit-font-smoothing: antialiased;
+  overflow-x: hidden;
+}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:41;background:rgb(var(--ink))}
+::selection{background:rgb(var(--rose));color:rgb(var(--cream))}
+button{cursor:pointer;color:inherit;font:inherit;background:none;border:0;padding:0}
+:focus-visible{outline:1px solid rgb(var(--petal));outline-offset:3px}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);border:0}
+
+.wrap{max-width:1480px;margin:0 auto;padding-left:max(16px, env(safe-area-inset-left,0px));padding-right:max(16px, env(safe-area-inset-right,0px))}
+@media (min-width:1024px){.wrap{padding-left:max(44px, env(safe-area-inset-left,0px));padding-right:max(44px, env(safe-area-inset-right,0px))}}
+
+/* grain */
+.grain{pointer-events:none;position:fixed;inset:0;z-index:60;opacity:.12;mix-blend-mode:overlay;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='180' height='180'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");
+  animation:grain 1s steps(5) infinite}
+@keyframes grain{0%{background-position:0 0}20%{background-position:-40px 30px}40%{background-position:60px -20px}60%{background-position:-20px -60px}80%{background-position:30px 50px}100%{background-position:0 0}}
+
+/* type helpers */
+.mono-s{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;color:rgb(var(--cream) / .5);text-transform:lowercase;line-height:1.5}
+.tag{display:inline-flex;align-items:center;gap:6px;font-family:var(--f-mono);font-size:10px;letter-spacing:.08em;color:rgb(var(--petal));border:1px solid rgb(var(--rose) / .55);padding:3px 7px 2px;border-radius:2px;white-space:nowrap;text-transform:lowercase}
+.tag::before{content:"";width:5px;height:5px;border-radius:50%;background:rgb(var(--rose))}
+
+/* header */
+.hdr{position:sticky;top:env(safe-area-inset-top,0px);z-index:40;background:linear-gradient(rgb(var(--ink) / .94), rgb(var(--ink) / .80));backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid rgb(var(--cream) / .08)}
+.hdr-in{display:flex;align-items:center;gap:18px;min-height:74px;flex-wrap:wrap;padding-block:8px}
+.brand{font-family:var(--f-display);font-style:italic;font-size:2.3rem;line-height:1;letter-spacing:-.05em;display:inline-block;transform:scaleY(1.07);transform-origin:bottom left;padding-right:4px}
+.brand .dot{color:rgb(var(--rose));font-style:normal;margin-left:1px}
+.brand-sub{font-family:var(--f-script);color:rgb(var(--petal));font-size:1.15rem;line-height:1;transform:rotate(-6deg) translateY(-10px);margin-left:-10px;white-space:nowrap}
+.brand-sep{width:1px;height:22px;background:rgb(var(--cream) / .2)}
+.nav{display:flex;align-items:center;overflow-x:auto;scrollbar-width:none;min-width:0}
+.nav::-webkit-scrollbar{display:none}
+.nav-i{position:relative;font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;color:rgb(var(--cream) / .5);padding:12px 14px;transition:color .3s;white-space:nowrap}
+.nav-i:hover,.nav-i.on{color:rgb(var(--cream))}
+.nav-i + .nav-i::before{content:"";position:absolute;left:0;top:50%;height:11px;width:1px;background:rgb(var(--cream) / .14);transform:translateY(-50%)}
+.nav-dot{position:absolute;left:50%;bottom:3px;width:4px;height:4px;margin-left:-2px;border-radius:50%;background:rgb(var(--rose))}
+.hdr-right{margin-left:auto;display:flex;align-items:center;gap:16px;min-width:0}
+.status{display:flex;align-items:center;gap:14px;font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;color:rgb(var(--cream) / .6);min-width:0}
+.status .mini-disc{width:18px;height:18px;border-radius:50%;object-fit:cover;animation:spin 3s linear infinite;flex:none;-webkit-mask:radial-gradient(circle,transparent 0 18%,#000 20%);mask:radial-gradient(circle,transparent 0 18%,#000 20%)}
+.status .np{max-width:180px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+@keyframes spin{to{transform:rotate(360deg)}}
+@media (max-width:820px){
+  .hdr-in{gap:4px 12px}
+  .brand-sep,.brand-sub{display:none}
+  .nav{order:3;width:100%;margin-left:-14px}
+  .status{display:none}
+}
+
+.btn{font-family:var(--f-mono);font-size:11px;letter-spacing:.1em;text-transform:lowercase;padding:9px 16px 8px;border:1px solid rgb(var(--cream) / .25);border-radius:2px;color:rgb(var(--cream));transition:background .3s,border-color .3s,color .3s;white-space:nowrap}
+.btn:hover{border-color:rgb(var(--cream));background:rgb(var(--cream) / .06)}
+.btn.primary{background:rgb(var(--cream));color:rgb(var(--ink));border-color:rgb(var(--cream))}
+.btn.primary:hover{background:transparent;color:rgb(var(--cream))}
+.btn.ghost{border-color:transparent;color:rgb(var(--cream) / .6);padding-inline:8px}
+.btn.ghost:hover{color:rgb(var(--cream));background:none}
+.link{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;color:rgb(var(--petal));border-bottom:1px solid rgb(var(--petal) / .35);padding-bottom:1px;transition:border-color .3s}
+.link:hover{border-color:rgb(var(--petal))}
+
+/* connections popover */
+.pop{position:absolute;right:0;top:calc(100% + 10px);width:320px;max-width:calc(100vw - 32px);background:rgb(var(--ink));border:1px solid rgb(var(--cream) / .14);padding:18px;box-shadow:0 30px 60px -20px rgba(0,0,0,.8);z-index:50}
+.pop-row{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;padding:12px 0;border-top:1px dashed rgb(var(--cream) / .12)}
+.pop-row:first-of-type{border-top:0;padding-top:4px}
+.pop-row h4{font-family:var(--f-display);font-style:italic;font-size:1.2rem;line-height:1.1}
+.pop-row p{grid-column:2;font-size:.98rem;line-height:1.35;color:rgb(var(--cream) / .75)}
+.sdot{width:7px;height:7px;border-radius:50%;margin-top:7px;background:rgb(var(--cream) / .25)}
+.sdot.demo{background:rgb(var(--rose))}
+
+/* page */
+.page{padding-block:34px 0}
+.sh{display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding-bottom:12px;border-bottom:1px solid rgb(var(--cream) / .12);margin-bottom:24px;flex-wrap:wrap}
+.sh h2{font-family:var(--f-display);font-style:italic;font-size:2rem;line-height:1;letter-spacing:-.015em;font-weight:400}
+.sh .script{font-family:var(--f-script);color:rgb(var(--petal));font-size:1.3rem;margin-left:10px;font-style:normal}
+
+.home-grid{display:grid;gap:64px 40px;grid-template-columns:minmax(0,1fr)}
+.home-grid > *{min-width:0}
+.col-music{order:-1}
+@media (min-width:760px){
+  .home-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .col-music{grid-column:1 / -1}
+}
+@media (min-width:1180px){
+  .home-grid{grid-template-columns:minmax(0,.92fr) minmax(0,1.5fr) minmax(0,1fr);gap:44px}
+  .col-music{order:0;grid-column:auto}
+}
+
+/* ---------- CD player ---------- */
+.cdp{container-type:inline-size}
+.stage{position:relative;overflow:hidden;display:flex;justify-content:center;
+  --s:min(330px, 51cqw);
+  padding-block:max(46px, calc(var(--s) * .16));
+  padding-inline:calc(var(--s) * .1);
+  border:1px solid rgb(var(--cream) / .08);
+  background-image:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.11) 0 1px, transparent 1px 3px),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.03) 0 1px, transparent 1px 3px),
+    radial-gradient(120% 95% at 28% 18%, rgb(var(--cherry)) 0%, rgb(var(--wine)) 58%, #170408 100%);
+  box-shadow: inset 0 0 120px rgba(0,0,0,.45);
+}
+.cdp-xl .stage{--s:min(450px, 51cqw)}
+.stage::before{content:"";position:absolute;inset:0;opacity:.35;mix-blend-mode:overlay;pointer-events:none;
+  background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.7 .08' numOctaves='3' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>")}
+.stage-lbl{position:absolute;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:rgb(var(--cream) / .72);text-transform:lowercase;display:flex;align-items:center;gap:7px;z-index:3}
+.stage-lbl.tl{top:16px;left:18px}.stage-lbl.tr{top:16px;right:18px}.stage-lbl.bl{bottom:16px;left:18px}.stage-lbl.br{bottom:12px;right:18px}
+.live{width:6px;height:6px;border-radius:50%;background:rgb(var(--cream) / .4)}
+.playing .live{background:rgb(var(--petal));animation:pulse 1.6s ease-in-out infinite}
+@keyframes pulse{50%{opacity:.25}}
+.reg{position:absolute;width:13px;height:13px;opacity:.35;z-index:2}
+.reg::before,.reg::after{content:"";position:absolute;background:rgb(var(--cream))}
+.reg::before{left:6px;top:0;bottom:0;width:1px}.reg::after{top:6px;left:0;right:0;height:1px}
+
+.art{position:relative;width:calc(var(--s) * 1.64);height:var(--s);max-width:100%;z-index:1}
+.sleeve{position:absolute;left:0;top:calc(var(--s) * .03);width:var(--s);height:calc(var(--s) * .94);display:flex;z-index:2;
+  box-shadow:0 34px 50px -22px rgba(0,0,0,.85), 0 0 0 1px rgba(255,255,255,.09);background:#0d0a0b}
+.spine{width:calc(var(--s) * .06);flex:none;display:flex;align-items:center;justify-content:center;overflow:hidden;
+  background:repeating-linear-gradient(90deg, rgba(255,255,255,.05) 0 1px, transparent 1px 4px), linear-gradient(90deg,#1d1517,#0b0809);border-right:1px solid rgba(255,255,255,.1)}
+.spine span{writing-mode:vertical-rl;transform:rotate(180deg);font-family:var(--f-mono);font-size:max(7px, calc(var(--s) * .026));letter-spacing:.22em;color:rgb(var(--cream) / .6);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-height:90%;text-transform:uppercase}
+.face{position:relative;flex:1;overflow:hidden}
+.face img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.sleeve::after{content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(118deg, rgba(255,255,255,.18) 0%, rgba(255,255,255,.04) 26%, rgba(255,255,255,0) 40%, rgba(255,255,255,0) 72%, rgba(255,255,255,.07) 100%)}
+
+.disc{position:absolute;left:calc(var(--s) * .06);top:calc(var(--s) * .03);width:calc(var(--s) * .94);aspect-ratio:1;max-width:100%;
+  transform:translateX(38%);transition:transform 1.3s var(--ease);filter:drop-shadow(0 22px 26px rgba(0,0,0,.6));z-index:1}
+.playing .disc{transform:translateX(64%)}
+.disc-body{position:absolute;inset:0;border-radius:50%;overflow:hidden;
+  -webkit-mask:radial-gradient(circle, transparent 0 7.3%, #000 7.6%);mask:radial-gradient(circle, transparent 0 7.3%, #000 7.6%)}
+.disc-spin{position:absolute;inset:0;will-change:transform}
+.disc-spin img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:50%}
+.disc-grooves{position:absolute;inset:0;border-radius:50%;
+  background:repeating-radial-gradient(circle, rgba(0,0,0,0) 0 1.3px, rgba(0,0,0,.08) 1.3px 2.1px)}
+.disc-hub{position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,
+    transparent 0 7.6%, rgba(16,12,14,.95) 7.6% 9%, rgba(205,198,204,.42) 9% 14.5%,
+    rgba(255,255,255,.14) 14.5% 15.3%, rgba(18,14,16,.72) 15.3% 17.2%, rgba(0,0,0,.18) 17.2% 18.4%, transparent 18.4%)}
+.disc-ring-text{position:absolute;inset:0;width:100%;height:100%}
+.disc-rim{position:absolute;inset:0;border-radius:50%;box-shadow:inset 0 0 0 1px rgba(255,255,255,.22), inset 0 0 0 3px rgba(0,0,0,.25)}
+.disc-sheen{position:absolute;inset:0;border-radius:50%;mix-blend-mode:screen;pointer-events:none;
+  background:conic-gradient(from 210deg, transparent 0 6%, rgba(255,255,255,.26) 11%, transparent 17% 49%, rgba(255,255,255,.16) 58%, transparent 64%)}
+.disc-irid{position:absolute;inset:0;border-radius:50%;mix-blend-mode:screen;opacity:.85;pointer-events:none;
+  background:conic-gradient(from 30deg, #ff9aa244, #ffe2a844, #a8ffd844, #9ac8ff44, #d6a8ff44, #ff9aa244);
+  -webkit-mask:radial-gradient(circle, transparent 0 9%, #000 9.2% 14.5%, transparent 14.7% 90%, #000 91% 99.2%, transparent 99.6%);
+  mask:radial-gradient(circle, transparent 0 9%, #000 9.2% 14.5%, transparent 14.7% 90%, #000 91% 99.2%, transparent 99.6%)}
+
+.levels{display:flex;align-items:center;gap:2px;height:22px}
+.levels span{width:2px;height:calc(var(--h) * 100%);background:rgb(var(--cream) / .85);border-radius:1px;transform-origin:center;transition:transform .6s var(--ease)}
+.levels:not(.on) span{transform:scaleY(.35)}
+.levels.on span{animation:lv .9s ease-in-out var(--d) infinite alternate}
+@keyframes lv{to{transform:scaleY(.3)}}
+
+.cdp-meta{padding-top:26px;display:flex;flex-direction:column;gap:16px;
+  --title:clamp(2.2rem, 7.4cqw, 3.6rem)}
+.cdp-xl .cdp-meta{--title:clamp(2.4rem, 7.6cqw, 4.6rem)}
+.title-wrap{min-height:calc(var(--title) * 1.05)}
+.track-title{font-size:var(--title);line-height:1.02;text-wrap:balance;font-weight:400;overflow-wrap:anywhere}
+.type-credit{margin-top:8px}
+.by{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 14px}
+.by .artist{font-family:var(--f-mono);font-size:12px;letter-spacing:.16em;text-transform:uppercase}
+.by .album{font-size:1.08rem;color:rgb(var(--cream) / .7)}
+
+.prog{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:14px;font-family:var(--f-mono);font-size:11px;color:rgb(var(--cream) / .65);font-variant-numeric:tabular-nums}
+.bar{position:relative;height:16px}
+.bar::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:rgb(var(--cream) / .2)}
+.bar-fill{position:absolute;left:0;right:0;top:calc(50% - .5px);height:2px;background:rgb(var(--petal));transform-origin:left;transition:transform .25s linear}
+.bar-knob{position:absolute;top:50%;width:9px;height:9px;margin:-4.5px 0 0 -4.5px;border-radius:50%;background:rgb(var(--cream));transition:left .25s linear, transform .2s;box-shadow:0 0 0 4px rgb(var(--ink) / .5)}
+.bar:hover .bar-knob{transform:scale(1.3)}
+.bar input{position:absolute;inset:0;width:100%;opacity:0;cursor:pointer;margin:0}
+
+.ctrls{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.ib{position:relative;width:40px;height:40px;display:grid;place-items:center;color:rgb(var(--cream) / .65);transition:color .3s}
+.ib:hover{color:rgb(var(--cream))}
+.ib.on{color:rgb(var(--petal))}
+.ib.on::after{content:"";position:absolute;bottom:4px;left:50%;width:3px;height:3px;margin-left:-1.5px;border-radius:50%;background:rgb(var(--petal))}
+.ib sup{position:absolute;top:8px;right:6px;font-family:var(--f-mono);font-size:8px}
+.ib svg,.playbtn svg{width:19px;height:19px}
+.playbtn{width:56px;height:56px;border-radius:50%;display:grid;place-items:center;border:1px solid rgb(var(--cream) / .55);margin:0 6px;transition:background .35s,color .35s,border-color .35s}
+.playbtn:hover{background:rgb(var(--cream));color:rgb(var(--ink));border-color:rgb(var(--cream))}
+.vol{margin-left:auto;display:flex;align-items:center;gap:10px;color:rgb(var(--cream) / .6)}
+.vol svg{width:17px;height:17px}
+.thin-range{-webkit-appearance:none;appearance:none;width:90px;height:16px;background:transparent;cursor:pointer}
+.thin-range::-webkit-slider-runnable-track{height:1px;background:linear-gradient(90deg, rgb(var(--petal)) var(--v), rgb(var(--cream) / .22) var(--v))}
+.thin-range::-moz-range-track{height:1px;background:rgb(var(--cream) / .22)}
+.thin-range::-moz-range-progress{height:1px;background:rgb(var(--petal))}
+.thin-range::-webkit-slider-thumb{-webkit-appearance:none;width:9px;height:9px;border-radius:50%;background:rgb(var(--cream));margin-top:-4px;border:0}
+.thin-range::-moz-range-thumb{width:9px;height:9px;border-radius:50%;background:rgb(var(--cream));border:0}
+
+.upnext{display:flex;justify-content:space-between;gap:16px;align-items:baseline;padding-top:14px;border-top:1px dashed rgb(var(--cream) / .12);flex-wrap:wrap}
+.upnext .t{font-style:italic;font-size:1.05rem;color:rgb(var(--cream) / .8)}
+
+/* ---------- pomodoro ---------- */
+.pomo-modes{display:flex;gap:18px;flex-wrap:wrap}
+.pm{position:relative;font-family:var(--f-mono);font-size:11px;letter-spacing:.07em;color:rgb(var(--cream) / .45);padding-bottom:6px;transition:color .3s}
+.pm:hover,.pm.on{color:rgb(var(--cream))}
+.pm.on::after{content:"";position:absolute;left:0;right:0;bottom:0;height:1px;background:rgb(var(--rose))}
+.digits{font-family:var(--f-display);line-height:1;letter-spacing:-.02em;display:flex;align-items:center;font-weight:400}
+.dg{position:relative;display:flex;justify-content:center;width:.5em;height:1.02em;overflow:hidden}
+.dg > span{display:block}
+.colon{width:.24em;text-align:center;opacity:.55;transform:translateY(-.05em)}
+.running .colon{animation:pulse 2s ease-in-out infinite}
+.pomo-digits{font-size:clamp(4.6rem, 10cqw, 6.4rem)}
+.pomo-full .pomo-digits{font-size:clamp(5.4rem, 21cqw, 13rem)}
+.pomo{container-type:inline-size}
+.pomo-script{font-family:var(--f-script);color:rgb(var(--petal));font-size:1.55rem;line-height:1;white-space:nowrap}
+.pomo-full .pomo-script{font-size:2.3rem}
+.ruler{position:relative;height:34px;margin-top:6px}
+.ruler-ticks{position:absolute;inset:0 0 auto 0;display:flex;justify-content:space-between}
+.tick{position:relative;width:1px;height:8px;background:rgb(var(--cream) / .22);transition:background .4s}
+.tick.major{height:14px;background:rgb(var(--cream) / .38)}
+.tick.on{background:rgb(var(--rose))}
+.tick em{position:absolute;top:18px;left:0;transform:translateX(-50%);font-style:normal;font-family:var(--f-mono);font-size:9px;color:rgb(var(--cream) / .4)}
+.needle{position:absolute;top:-5px;width:1px;height:24px;background:rgb(var(--cream));transition:left .4s linear}
+.needle::before{content:"";position:absolute;top:-3px;left:-3px;width:7px;height:7px;border-radius:50%;background:rgb(var(--cream))}
+.cycle{display:flex;gap:6px;align-items:center}
+.cycle i{width:7px;height:7px;border:1px solid rgb(var(--cream) / .45);transform:rotate(45deg);transition:background .4s}
+.cycle i.on{background:rgb(var(--petal));border-color:rgb(var(--petal))}
+.adjust{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 22px;padding:16px 0 4px;border-top:1px dashed rgb(var(--cream) / .12)}
+.stepper{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.stepper .v{font-family:var(--f-display);font-size:1.5rem;min-width:2.4ch;text-align:center}
+.stepper button{width:26px;height:26px;border:1px solid rgb(var(--cream) / .2);border-radius:2px;font-family:var(--f-mono);font-size:13px;line-height:1;color:rgb(var(--cream) / .75)}
+.stepper button:hover{border-color:rgb(var(--cream))}
+
+/* ---------- tasks ---------- */
+.task{display:flex;gap:12px;align-items:flex-start;padding:8px 0;border-bottom:1px dashed rgb(var(--cream) / .09)}
+.chk{width:13px;height:13px;flex:none;margin-top:6px;border:1px solid rgb(var(--cream) / .45);display:grid;place-items:center;transition:background .3s,border-color .3s}
+.chk svg{width:9px;height:9px;opacity:0;transition:opacity .3s}
+.task.done .chk{background:rgb(var(--rose));border-color:rgb(var(--rose))}
+.task.done .chk svg{opacity:1}
+.ttext{flex:1;min-width:0;font-size:1.08rem;line-height:1.35;text-decoration:line-through;text-decoration-color:transparent;text-decoration-thickness:1px;transition:color .4s, text-decoration-color .4s;overflow-wrap:anywhere}
+.task.done .ttext{color:rgb(var(--cream) / .38);text-decoration-color:rgb(var(--cream) / .5)}
+.tdel{opacity:0;font-family:var(--f-mono);font-size:12px;color:rgb(var(--cream) / .5);transition:opacity .25s;padding:2px 4px}
+.task:hover .tdel,.tdel:focus-visible{opacity:1}
+@media (hover:none){.tdel{opacity:.5}}
+.add{width:100%;background:transparent;border:0;border-bottom:1px solid rgb(var(--cream) / .14);padding:9px 0;font-family:var(--f-body);font-style:italic;font-size:1.05rem;color:rgb(var(--cream))}
+.add::placeholder{color:rgb(var(--cream) / .35)}
+.add:focus{outline:none;border-color:rgb(var(--petal))}
+
+/* ---------- streak ---------- */
+.streak-n{font-family:var(--f-display);font-size:3.4rem;line-height:.9;display:flex;align-items:baseline;gap:10px}
+.streak-u{font-family:var(--f-script);font-size:1.4rem;color:rgb(var(--petal))}
+.streak-today{font-family:var(--f-display);font-size:1.5rem;line-height:1.1}
+.goal-line{height:1px;background:rgb(var(--cream) / .15);margin:14px 0 18px;position:relative}
+.goal-line > div{position:absolute;inset:-.5px 0;height:2px;background:rgb(var(--petal));transform-origin:left;transition:transform 1s var(--ease)}
+.week{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}
+.wk{display:flex;flex-direction:column;align-items:center;gap:6px}
+.wk-bar{height:54px;width:100%;max-width:16px;display:flex;align-items:flex-end;border-bottom:1px solid rgb(var(--cream) / .18)}
+.wk-bar > div{width:100%;background:rgb(var(--cream) / .28);transition:height .9s var(--ease)}
+.wk.today .wk-bar > div{background:rgb(var(--petal))}
+.wk span{font-family:var(--f-mono);font-size:9.5px;color:rgb(var(--cream) / .45)}
+.wk.today span{color:rgb(var(--cream))}
+
+/* ---------- chat ---------- */
+.chat{display:flex;flex-direction:column;height:var(--chat-h, 660px);border:1px solid rgb(var(--cream) / .1);background:linear-gradient(rgb(var(--wine) / .28), rgb(var(--ink) / .2))}
+.chat-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid rgb(var(--cream) / .08)}
+.chat-head h3{font-family:var(--f-display);font-style:italic;font-size:1.25rem;line-height:1.1;font-weight:400;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.chat-scroll{flex:1;overflow-y:auto;padding:18px 16px;display:flex;flex-direction:column;gap:24px;scrollbar-width:thin;scrollbar-color:rgb(var(--cream) / .2) transparent;min-height:0}
+.msg{display:flex;flex-direction:column;gap:8px;min-width:0}
+.msg-who{display:flex;align-items:center;gap:10px;font-family:var(--f-mono);font-size:10px;letter-spacing:.1em;color:rgb(var(--cream) / .45)}
+.msg-ai .msg-who{color:rgb(var(--petal))}
+.demo-mini{font-family:var(--f-mono);font-size:9px;letter-spacing:.06em;color:rgb(var(--cream) / .4);border:1px solid rgb(var(--cream) / .18);padding:1px 5px;border-radius:2px}
+.rich{display:flex;flex-direction:column;gap:.55em;font-size:1.06rem;line-height:1.45;max-width:65ch}
+.rich strong{font-weight:600;color:rgb(var(--cream))}
+.rich ul{display:flex;flex-direction:column;gap:.3em;padding:0;margin:0;list-style:none}
+.rich li{padding-left:1.2em;position:relative}
+.rich li::before{content:"\2014";position:absolute;left:0;color:rgb(var(--petal))}
+.msg-user .rich{font-style:italic;color:rgb(var(--cream) / .82);padding-left:12px;border-left:1px solid rgb(var(--rose) / .6)}
+.slips{display:flex;flex-wrap:wrap;gap:6px}
+.slip{display:inline-flex;align-items:center;gap:8px;border:1px solid rgb(var(--cream) / .16);padding:3px 8px 3px 3px;font-family:var(--f-mono);font-size:10.5px;color:rgb(var(--cream) / .75);max-width:100%;min-width:0;background:rgb(var(--ink) / .4)}
+.slip .ext{width:28px;height:28px;flex:none;display:grid;place-items:center;background:rgb(var(--cream) / .08);font-size:8.5px;letter-spacing:.06em;color:rgb(var(--petal))}
+.slip img{width:28px;height:28px;object-fit:cover;flex:none}
+.slip .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.slip .x{margin-left:2px;color:rgb(var(--cream) / .5);padding:0 2px}
+.slip .x:hover{color:rgb(var(--cream))}
+.qa{display:flex;flex-wrap:wrap;gap:6px;padding:10px 16px 0}
+.qa button{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.06em;border:1px solid rgb(var(--cream) / .18);padding:5px 10px 4px;border-radius:2px;color:rgb(var(--cream) / .75);transition:border-color .3s,color .3s}
+.qa button:hover{border-color:rgb(var(--petal));color:rgb(var(--petal))}
+.composer{padding:10px 16px 14px;display:flex;flex-direction:column;gap:8px;transition:outline-color .2s;outline:1px dashed transparent;outline-offset:-6px}
+.composer.drag{outline-color:rgb(var(--petal))}
+.composer textarea{width:100%;resize:none;background:transparent;border:0;border-bottom:1px solid rgb(var(--cream) / .14);padding:8px 0;font-family:var(--f-body);font-size:1.06rem;line-height:1.35;color:rgb(var(--cream));max-height:120px}
+.composer textarea::placeholder{color:rgb(var(--cream) / .35);font-style:italic}
+.composer textarea:focus{outline:none;border-color:rgb(var(--petal))}
+.composer-row{display:flex;align-items:center;gap:12px}
+.attach{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.08em;color:rgb(var(--cream) / .75);cursor:pointer;border-bottom:1px solid rgb(var(--cream) / .3);padding-bottom:1px}
+.attach:hover{color:rgb(var(--cream))}
+.attach:focus-within{outline:1px solid rgb(var(--petal));outline-offset:3px}
+.send{margin-left:auto;width:34px;height:34px;display:grid;place-items:center;border:1px solid rgb(var(--cream) / .3);border-radius:2px;transition:background .3s,color .3s}
+.send:hover{background:rgb(var(--cream));color:rgb(var(--ink))}
+.send svg{width:16px;height:16px}
+.typing{display:flex;gap:5px;align-items:center;height:18px}
+.typing i{width:4px;height:4px;border-radius:50%;background:rgb(var(--petal));animation:pulse 1s ease-in-out infinite}
+.typing i:nth-child(2){animation-delay:.15s}.typing i:nth-child(3){animation-delay:.3s}
+
+.fc{display:flex;flex-direction:column;gap:10px;max-width:420px}
+.fc-card{width:100%;aspect-ratio:16/10;perspective:900px;text-align:left}
+.fc-inner{position:relative;width:100%;height:100%;transition:transform .7s var(--ease);transform-style:preserve-3d}
+.fc-inner.flipped{transform:rotateY(180deg)}
+.fc-face{position:absolute;inset:0;backface-visibility:hidden;-webkit-backface-visibility:hidden;padding:14px 16px;display:flex;flex-direction:column;justify-content:space-between;color:rgb(var(--ink));
+  background:linear-gradient(rgb(var(--rose)) 0 0) 0 30px / 100% 1px no-repeat, repeating-linear-gradient(transparent 0 21px, rgba(60,90,140,.16) 21px 22px) 0 52px / 100% calc(100% - 52px) no-repeat, rgb(var(--cream));
+  box-shadow:0 18px 30px -16px rgba(0,0,0,.8)}
+.fc-face.back{transform:rotateY(180deg);background-color:#f2e9df}
+.fc-face .lbl{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.12em;color:rgb(var(--rose))}
+.fc-face p{font-size:1.18rem;line-height:1.3;font-weight:500}
+.fc-nav{display:flex;align-items:center;justify-content:space-between;font-family:var(--f-mono);font-size:10.5px;color:rgb(var(--cream) / .6)}
+.fc-nav button:hover{color:rgb(var(--cream))}
+
+.quiz{display:flex;flex-direction:column}
+.q{padding:12px 0;border-top:1px dashed rgb(var(--cream) / .12);display:flex;flex-direction:column;gap:8px}
+.q h5{font-size:1.06rem;line-height:1.35;font-weight:500}
+.opt{display:flex;gap:10px;text-align:left;font-size:1rem;line-height:1.3;color:rgb(var(--cream) / .8);padding:3px 0;transition:color .3s}
+.opt b{font-family:var(--f-mono);font-weight:400;font-size:10.5px;color:rgb(var(--cream) / .45);padding-top:3px}
+.opt:hover{color:rgb(var(--cream))}
+.opt.right{color:rgb(var(--petal))}
+.opt.right b{color:rgb(var(--petal))}
+.opt.wrong{text-decoration:line-through;color:rgb(var(--cream) / .35)}
+.why{font-style:italic;font-size:.98rem;color:rgb(var(--cream) / .65)}
+
+/* ---------- music page ---------- */
+.crate-tabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.ptab{display:flex;flex-direction:column;gap:8px;text-align:left;opacity:.6;transition:opacity .3s}
+.ptab:hover,.ptab.on{opacity:1}
+.collage{display:grid;grid-template-columns:1fr 1fr;aspect-ratio:1;box-shadow:0 0 0 1px rgb(var(--cream) / .1)}
+.collage img{width:100%;height:100%;object-fit:cover;display:block}
+.ptab.on .collage{box-shadow:0 0 0 1px rgb(var(--petal))}
+.ptab h4{font-family:var(--f-display);font-style:italic;font-size:1.2rem;line-height:1.05;font-weight:400}
+.trow{display:grid;grid-template-columns:22px 44px minmax(0,1fr) auto;gap:14px;align-items:center;padding:9px 6px;text-align:left;width:100%;border-bottom:1px solid rgb(var(--cream) / .07);transition:background .3s}
+.trow:hover{background:rgb(var(--cream) / .04)}
+.trow img{width:44px;height:44px;object-fit:cover}
+.trow .n{font-family:var(--f-mono);font-size:10.5px;color:rgb(var(--cream) / .45)}
+.trow .tt{font-family:var(--f-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trow .ta{font-family:var(--f-mono);font-size:10.5px;color:rgb(var(--cream) / .45);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.trow .d{font-family:var(--f-mono);font-size:11px;color:rgb(var(--cream) / .55);font-variant-numeric:tabular-nums}
+.trow.on .tt{color:rgb(var(--petal))}
+.eq{display:inline-flex;gap:2px;align-items:flex-end;height:10px}
+.eq i{width:2px;background:rgb(var(--petal));height:100%;animation:lv .7s ease-in-out infinite alternate}
+.eq i:nth-child(2){animation-delay:.2s}.eq i:nth-child(3){animation-delay:.4s}
+.typetable{width:100%;border-collapse:collapse;min-width:520px}
+.typetable td,.typetable th{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid rgb(var(--cream) / .08);vertical-align:baseline}
+.typetable th{font-family:var(--f-mono);font-weight:400;font-size:10px;letter-spacing:.08em;color:rgb(var(--cream) / .45)}
+.typetable .sample{font-size:1.45rem;line-height:1.1;white-space:nowrap}
+.typetable .why{font-size:.95rem}
+
+/* ---------- planner ---------- */
+.week-board{display:grid;grid-template-columns:repeat(7,minmax(160px,1fr));border-top:1px solid rgb(var(--cream) / .1);border-left:1px solid rgb(var(--cream) / .1)}
+.day{border-right:1px solid rgb(var(--cream) / .1);border-bottom:1px solid rgb(var(--cream) / .1);padding:14px 14px 16px;min-height:260px;display:flex;flex-direction:column;gap:4px}
+.day.today{background:rgb(var(--wine) / .45)}
+.day h4{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:8px}
+.day h4 .d1{font-family:var(--f-display);font-style:italic;font-size:1.5rem;font-weight:400}
+.day h4 .d2{font-family:var(--f-mono);font-size:10.5px;color:rgb(var(--cream) / .45)}
+.day.today h4 .d2{color:rgb(var(--petal))}
+.day .task{padding:6px 0}
+.day .ttext{font-size:1rem}
+.day .add{font-size:.98rem;margin-top:auto}
+.scroll-x{overflow-x:auto;scrollbar-width:thin;scrollbar-color:rgb(var(--cream) / .2) transparent}
+.logrow{display:grid;grid-template-columns:110px 1fr auto;gap:12px;padding:9px 0;border-bottom:1px dashed rgb(var(--cream) / .09);align-items:baseline}
+.logrow .a{font-family:var(--f-mono);font-size:10.5px;color:rgb(var(--cream) / .5)}
+.logrow .m{font-family:var(--f-display);font-size:1.2rem}
+.bigstat{font-family:var(--f-display);font-size:2.6rem;line-height:1}
+
+/* ---------- ai page ---------- */
+.ai-grid{display:grid;grid-template-columns:minmax(0,1fr);gap:28px}
+@media (min-width:900px){.ai-grid{grid-template-columns:240px minmax(0,1fr)}}
+.convo{display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:10px 0;border-bottom:1px dashed rgb(var(--cream) / .1);text-align:left;width:100%}
+.convo .ct{font-size:1.05rem;line-height:1.25;color:rgb(var(--cream) / .7);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.convo.on .ct{color:rgb(var(--cream));font-style:italic}
+.convo:hover .ct{color:rgb(var(--cream))}
+
+.foot{margin-top:84px;border-top:1px solid rgb(var(--cream) / .08);padding-block:26px 34px;display:flex;flex-wrap:wrap;gap:12px 28px;align-items:baseline}
+.foot .sig{font-family:var(--f-display);font-style:italic;font-size:1.3rem;margin-right:auto}
+
+@media (prefers-reduced-motion: reduce){
+  .grain{animation:none}
+  .levels.on span,.eq i,.typing i,.playing .live,.running .colon{animation:none}
+  .disc,.fc-inner{transition-duration:.01s}
+  .status .mini-disc{animation:none}
+}
+</style>
+
+<div id="root"></div>
+
+<script type="text/babel" data-presets="react">
+const { useState, useEffect, useRef, useMemo, useCallback, createContext, useContext } = React;
+
+/* ---------- framer motion (with a plain fallback if the CDN fails) ---------- */
+const FM = window.Motion;
+const motion = FM && FM.motion ? FM.motion : (() => {
+  const cache = {};
+  return new Proxy({}, { get(_, tag) {
+    if (!cache[tag]) cache[tag] = React.forwardRef(function M(props, ref) {
+      const { initial, animate, exit, transition, layout, layoutId, whileHover, whileTap, variants, ...rest } = props;
+      return React.createElement(tag, { ref, ...rest });
+    });
+    return cache[tag];
+  } });
+})();
+const AnimatePresence = FM && FM.AnimatePresence ? FM.AnimatePresence : ({ children }) => <>{children}</>;
+const EASE = [.22, .61, .36, 1];
+
+/* ---------- small utils ---------- */
+const uid = () => Math.random().toString(36).slice(2, 10);
+const pad = n => String(n).padStart(2, '0');
+const mmss = s => `${pad(Math.floor(s / 60))}:${pad(Math.floor(s % 60))}`;
+const mss = s => { s = Math.max(0, Math.floor(s)); return `${Math.floor(s / 60)}:${pad(s % 60)}`; };
+const dayKey = (d = new Date()) => { const x = new Date(d); return `${x.getFullYear()}-${pad(x.getMonth() + 1)}-${pad(x.getDate())}`; };
+const addDays = (d, n) => { const x = new Date(d); x.setDate(x.getDate() + n); return x; };
+const weekStart = () => { const d = new Date(); d.setHours(0, 0, 0, 0); return addDays(d, -((d.getDay() + 6) % 7)); };
+const DOW = ['mon', 'tue', 'wed', 'thu', 'fri', 'sat', 'sun'];
+const fmtMin = m => m >= 60 ? `${Math.floor(m / 60)}h${m % 60 ? ' ' + (m % 60) + 'm' : ''}` : `${m}m`;
+const kb = n => n > 1e6 ? (n / 1e6).toFixed(1) + ' mb' : Math.max(1, Math.round(n / 1000)) + ' kb';
+
+const store = {
+  get(k) { try { const v = localStorage.getItem('slaveaway:' + k); return v == null ? undefined : JSON.parse(v); } catch (e) { return undefined; } },
+  set(k, v) { try { localStorage.setItem('slaveaway:' + k, JSON.stringify(v)); } catch (e) {} }
+};
+function usePersist(key, init) {
+  const [v, setV] = useState(() => { const s = store.get(key); return s !== undefined ? s : (typeof init === 'function' ? init() : init); });
+  useEffect(() => { store.set(key, v); }, [key, v]);
+  return [v, setV];
+}
+
+/* ---------- sound ---------- */
+let AC = null;
+function unlockAudio() { try { if (!AC) AC = new (window.AudioContext || window.webkitAudioContext)(); if (AC.state === 'suspended') AC.resume(); } catch (e) {} }
+function chime() {
+  try {
+    unlockAudio(); if (!AC) return;
+    const now = AC.currentTime;
+    [659.25, 880, 1318.5].forEach((f, i) => {
+      const o = AC.createOscillator(), g = AC.createGain(), t0 = now + i * .22;
+      o.type = 'sine'; o.frequency.value = f;
+      g.gain.setValueAtTime(.0001, t0); g.gain.exponentialRampToValueAtTime(.14, t0 + .02); g.gain.exponentialRampToValueAtTime(.0001, t0 + 1.8);
+      o.connect(g); g.connect(AC.destination); o.start(t0); o.stop(t0 + 1.9);
+    });
+  } catch (e) {}
+}
+
+/* ---------- sample album art (drawn here, fictional records) ---------- */
+function rng(seed) { let s = seed; return () => (s = (s * 16807) % 2147483647) / 2147483647; }
+const GRAIN_DEF = `<filter id="g" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".85" numOctaves="2" stitchTiles="stitch"/><feColorMatrix type="saturate" values="0"/></filter>`;
+function cover(defs, body, grain = .2) {
+  const s = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 600" width="600" height="600"><defs>${GRAIN_DEF}${defs}</defs>${body}<rect width="600" height="600" filter="url(#g)" opacity="${grain}" style="mix-blend-mode:overlay"/></svg>`;
+  return 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(s);
+}
+const COVERS = {
+  cherry: cover(
+    `<linearGradient id="bg" gradientUnits="userSpaceOnUse" x1="0" y1="0" x2="0" y2="600"><stop offset="0" stop-color="#22030a"/><stop offset=".55" stop-color="#5c0d19"/><stop offset="1" stop-color="#8a1a2b"/></linearGradient><linearGradient id="sun" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3e6d6"/><stop offset=".65" stop-color="#e9b6a8"/><stop offset="1" stop-color="#d98a86"/></linearGradient>`,
+    `<rect width="600" height="600" fill="url(#bg)"/><circle cx="300" cy="318" r="168" fill="url(#sun)"/>${[0, 1, 2, 3, 4, 5, 6].map(i => `<rect x="110" y="${352 + i * 24}" width="380" height="${(3 + i * 2.6).toFixed(1)}" fill="url(#bg)"/>`).join('')}<text x="46" y="80" font-family="Georgia,serif" font-style="italic" font-size="32" fill="#f3e6d6">june marlowe</text><text x="554" y="558" text-anchor="end" font-family="Georgia,serif" font-size="14" letter-spacing="7" fill="#f3e6d6" opacity=".85">CHERRY STATIC</text>`),
+  nocturnes: (() => {
+    const r = rng(7); let stars = '';
+    for (let i = 0; i < 70; i++) stars += `<circle cx="${(40 + r() * 520).toFixed(1)}" cy="${(40 + r() * 380).toFixed(1)}" r="${(r() * 1.6 + .3).toFixed(2)}" fill="#efe6d8" opacity="${(.3 + r() * .6).toFixed(2)}"/>`;
+    return cover(
+      `<radialGradient id="bg" cx=".5" cy=".38" r=".85"><stop offset="0" stop-color="#2b2142"/><stop offset="1" stop-color="#09090f"/></radialGradient><mask id="moon"><circle cx="300" cy="250" r="88" fill="#fff"/><circle cx="338" cy="224" r="82" fill="#000"/></mask><filter id="b" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="28"/></filter>`,
+      `<rect width="600" height="600" fill="url(#bg)"/>${stars}<circle cx="300" cy="250" r="110" fill="#efe6d8" opacity=".12" filter="url(#b)"/><rect width="600" height="600" fill="#efe6d8" mask="url(#moon)"/><rect x="30" y="30" width="540" height="540" fill="none" stroke="#efe6d8" stroke-opacity=".35"/><text x="300" y="478" text-anchor="middle" font-family="Georgia,serif" font-size="28" letter-spacing="18" fill="#efe6d8">ODETTE</text><text x="300" y="512" text-anchor="middle" font-family="Georgia,serif" font-style="italic" font-size="17" fill="#efe6d8" opacity=".7">nocturnes for nobody</text>`, .24);
+  })(),
+  motel: cover(
+    `<linearGradient id="bg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#051214"/><stop offset=".7" stop-color="#0f2b2d"/></linearGradient><filter id="glow" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>`,
+    `<rect width="600" height="600" fill="url(#bg)"/><rect y="420" width="600" height="180" fill="#030b0c"/><polygon points="296,420 304,420 420,600 180,600" fill="#0a1819"/>${[0, 1, 2, 3].map(i => `<rect x="${298 - i * 1.2}" y="${430 + i * 42}" width="${4 + i * 2.4}" height="${14 + i * 8}" fill="#e9e0d4" opacity=".55"/>`).join('')}<rect x="296" y="285" width="8" height="135" fill="#0b2021"/><g filter="url(#glow)"><rect x="150" y="172" width="300" height="112" rx="10" fill="none" stroke="#ff6b7a" stroke-width="4"/><text x="300" y="252" text-anchor="middle" font-family="Impact,Haettenschweiler,'Arial Narrow Bold',sans-serif" font-size="62" letter-spacing="4" fill="none" stroke="#ff6b7a" stroke-width="2.5">VACANCY</text></g><text x="168" y="198" font-family="Impact,sans-serif" font-size="18" fill="#3a1a1d">NO</text><text x="44" y="82" font-family="Impact,Haettenschweiler,sans-serif" font-size="42" letter-spacing="3" fill="#e9e0d4">HOLLOW SAINTS</text><text x="556" y="566" text-anchor="end" font-family="Arial,sans-serif" font-size="13" letter-spacing="5" fill="#e9e0d4" opacity=".7">MOTEL LIGHTS</text>`, .22),
+  bloomers: cover('',
+    `<rect width="600" height="600" fill="#ebe1d0"/><path d="M302 540 C 294 450 312 360 302 250" stroke="#5d6338" stroke-width="4" fill="none"/><ellipse cx="0" cy="0" rx="15" ry="40" fill="#6f7742" transform="translate(282 420) rotate(-38)"/><ellipse cx="0" cy="0" rx="13" ry="34" fill="#6f7742" transform="translate(322 352) rotate(40)"/>${[0, 1, 2, 3, 4, 5].map(i => `<ellipse cx="302" cy="182" rx="24" ry="50" fill="#a33a49" opacity=".86" transform="rotate(${i * 60} 302 232)"/>`).join('')}<circle cx="302" cy="232" r="15" fill="#3d1218"/><rect x="246" y="98" width="120" height="34" fill="#faf6ee" opacity=".72" transform="rotate(-7 306 115)"/><rect x="262" y="500" width="90" height="30" fill="#faf6ee" opacity=".72" transform="rotate(5 307 515)"/><text x="58" y="86" font-family="'Courier New',Courier,monospace" font-size="22" fill="#2a2222">the lindens</text><text x="58" y="114" font-family="'Courier New',Courier,monospace" font-size="16" fill="#2a2222" opacity=".7">late bloomers</text><text x="545" y="565" text-anchor="end" font-family="'Courier New',monospace" font-size="13" fill="#2a2222" opacity=".6">no. 4</text>`, .38),
+  softcore: cover(
+    `<filter id="bl" x="-50%" y="-50%" width="200%" height="200%"><feGaussianBlur stdDeviation="58"/></filter>`,
+    `<rect width="600" height="600" fill="#cdd5de"/><g filter="url(#bl)"><circle cx="220" cy="240" r="170" fill="#8fa6c0"/><circle cx="410" cy="380" r="165" fill="#edc4cb"/><circle cx="340" cy="170" r="110" fill="#f6f1ea"/><circle cx="170" cy="460" r="120" fill="#b5c2d8"/></g><path d="M470 110 v22 M459 121 h22" stroke="#31384a" stroke-width="1.5"/><text x="40" y="562" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#31384a">mira kō</text><text x="560" y="562" text-anchor="end" font-family="Arial,Helvetica,sans-serif" font-size="18" fill="#31384a" opacity=".6">softcore</text>`, .3),
+  fern: cover('',
+    `<rect width="600" height="600" fill="#c88a2c"/>${[[540, '#e8d6b4'], [460, '#b5542a'], [380, '#6b2f1c'], [300, '#e8d6b4'], [220, '#c88a2c'], [140, '#8a3a1f']].map(([r, c]) => `<circle cx="0" cy="600" r="${r}" fill="${c}"/>`).join('')}<text x="560" y="84" text-anchor="end" font-family="Georgia,serif" font-style="italic" font-size="36" fill="#2c1408">Little Wren</text><text x="560" y="116" text-anchor="end" font-family="Georgia,serif" font-size="16" letter-spacing="9" fill="#2c1408">FERN</text>`, .3),
+  exvivo: cover(
+    `<filter id="mb" x="0" y="0" width="100%" height="100%"><feTurbulence type="fractalNoise" baseFrequency=".004 .009" numOctaves="5" seed="11" result="t"/><feColorMatrix in="t" type="matrix" values="0 0 0 0 .64  0 0 0 0 .76  0 0 0 0 .86  2.6 0 0 0 -1.05"/></filter>`,
+    `<rect width="600" height="600" fill="#0b0d10"/><rect width="600" height="600" filter="url(#mb)"/><rect x="118" y="262" width="364" height="44" fill="#0b0d10"/><g stroke="#dfe6ea" stroke-width="1" opacity=".7"><path d="M40 52 h22 M51 41 v22"/><path d="M538 52 h22 M549 41 v22"/><circle cx="549" cy="52" r="7" fill="none"/></g><text x="300" y="60" text-anchor="middle" font-family="'Arial Narrow',Arial,sans-serif" font-size="14" letter-spacing="10" fill="#dfe6ea">SAINT VELLUM</text><text x="40" y="566" font-family="'Courier New',monospace" font-size="11" letter-spacing="2" fill="#dfe6ea" opacity=".8">EX VIVO — SV/07 — 2026</text>`, .18)
+};
+
+/* ---------- sample catalog ---------- */
+const TRACKS = [
+  { id: 't1', title: 'velvet hours', artist: 'June Marlowe', album: 'cherry static', year: 2024, dur: 222, cover: COVERS.cherry, cat: 'SLV-001' },
+  { id: 't2', title: 'slow dancing in the library', artist: 'Odette', album: 'nocturnes for nobody', year: 2023, dur: 258, cover: COVERS.nocturnes, cat: 'SLV-002' },
+  { id: 't3', title: '438 miles', artist: 'Hollow Saints', album: 'motel lights', year: 2022, dur: 185, cover: COVERS.motel, cat: 'SLV-003' },
+  { id: 't4', title: 'paper moons', artist: 'The Lindens', album: 'late bloomers', year: 2025, dur: 177, cover: COVERS.bloomers, cat: 'SLV-004' },
+  { id: 't5', title: 'blue hour', artist: 'mira kō', album: 'softcore', year: 2024, dur: 211, cover: COVERS.softcore, cat: 'SLV-005' },
+  { id: 't6', title: "honey, it's late", artist: 'Little Wren', album: 'fern', year: 2021, dur: 228, cover: COVERS.fern, cat: 'SLV-006' },
+  { id: 't7', title: 'glass anatomy', artist: 'Saint Vellum', album: 'ex vivo', year: 2026, dur: 242, cover: COVERS.exvivo, cat: 'SLV-007' }
+];
+const TRACK = Object.fromEntries(TRACKS.map(t => [t.id, t]));
+const PLAYLISTS = [
+  { id: 'p1', name: '3am library', note: 'for the last chapter', ids: ['t2', 't1', 't5', 't7'] },
+  { id: 'p2', name: 'rainy commute', note: 'windows fogged up', ids: ['t3', 't4', 't6', 't1'] },
+  { id: 'p3', name: 'the whole crate', note: 'every sample record', ids: TRACKS.map(t => t.id) }
+];
+
+/* ---------- album typography system ----------
+   Matches artist + album first, then artist alone, then the house default.
+   Every face is an SIL Open Font License alternative from Google Fonts chosen
+   to evoke the record. None of them is an official album font. */
+const DEFAULT_TYPE = { font: 'Instrument Serif', family: '"Instrument Serif", Georgia, serif', style: 'italic', weight: 400, transform: 'none', tracking: '-0.01em', scale: 1.08, license: 'SIL OFL', why: 'house default for anything without a match' };
+const TYPE_RULES = [
+  { artist: 'June Marlowe', album: 'cherry static', font: 'Playfair Display', family: '"Playfair Display", Georgia, serif', style: 'italic', weight: 500, tracking: '-0.02em', scale: .96, why: 'high-contrast retro serif, like the sunset sleeve', sample: true },
+  { artist: 'Odette', album: 'nocturnes for nobody', font: 'Pinyon Script', family: '"Pinyon Script", cursive', style: 'normal', tracking: '0', scale: 1.12, why: 'copperplate script for a candlelit record', sample: true },
+  { artist: 'Hollow Saints', album: 'motel lights', font: 'Anton', family: 'Anton, Impact, sans-serif', style: 'normal', transform: 'uppercase', tracking: '.01em', scale: 1.02, why: 'condensed poster sans, like a roadside sign', sample: true },
+  { artist: 'The Lindens', album: 'late bloomers', font: 'Special Elite', family: '"Special Elite", "Courier New", monospace', style: 'normal', tracking: '0', scale: .8, why: 'typewriter, to match the pressed-flower scrapbook', sample: true },
+  { artist: 'mira kō', album: 'softcore', font: 'Syne', family: 'Syne, sans-serif', style: 'normal', weight: 600, tracking: '-0.03em', scale: .9, why: 'soft, wide grotesk for a hazy record', sample: true },
+  { artist: 'Little Wren', album: 'fern', font: 'Fraunces', family: 'Fraunces, Georgia, serif', style: 'italic', weight: 600, tracking: '-0.02em', scale: .94, why: 'warm 1970s soft serif', sample: true },
+  { artist: 'Saint Vellum', album: 'ex vivo', font: 'Bodoni Moda', family: '"Bodoni Moda", Didot, serif', style: 'normal', weight: 500, transform: 'uppercase', tracking: '.06em', scale: .74, why: 'cold didone for a glossy, clinical sleeve', sample: true },
+  { artist: 'Taylor Swift', album: 'folklore', font: 'IM Fell English', family: '"IM Fell English", Georgia, serif', style: 'italic', why: 'old-style book serif for the woodland era' },
+  { artist: 'Laufey', font: 'Pinyon Script', family: '"Pinyon Script", cursive', style: 'normal', scale: 1.12, why: 'jazz-age copperplate' },
+  { artist: 'Mitski', font: 'Bodoni Moda', family: '"Bodoni Moda", Didot, serif', style: 'italic', scale: .9, why: 'theatrical didone' },
+  { artist: 'Clairo', font: 'Cormorant Garamond', family: '"Cormorant Garamond", Georgia, serif', style: 'italic', weight: 500, why: 'soft, bookish serif' },
+  { artist: 'Tame Impala', font: 'Syne', family: 'Syne, sans-serif', style: 'normal', weight: 700, scale: .9, why: 'wide psychedelic grotesk' },
+  { artist: 'beabadoobee', font: 'Special Elite', family: '"Special Elite", monospace', style: 'normal', scale: .82, why: 'zine-style typewriter' },
+  { artist: 'Lana Del Rey', font: 'Playfair Display', family: '"Playfair Display", Georgia, serif', style: 'italic', why: 'old Hollywood serif' }
+];
+const eq = (a, b) => (a || '').toLowerCase() === (b || '').toLowerCase();
+function typeFor(t) {
+  const r = TYPE_RULES.find(r => r.album && eq(r.artist, t.artist) && eq(r.album, t.album))
+         || TYPE_RULES.find(r => !r.album && eq(r.artist, t.artist));
+  return { ...DEFAULT_TYPE, weight: 400, transform: 'none', tracking: '0', scale: 1, license: 'SIL OFL', ...(r || DEFAULT_TYPE) };
+}
+
+/* ---------- seeds (clearly sample data) ---------- */
+function seedTasks() {
+  const t = dayKey(), t1 = dayKey(addDays(new Date(), 1)), t2 = dayKey(addDays(new Date(), 2)), y = dayKey(addDays(new Date(), -1));
+  return [
+    { id: uid(), text: 'finish the chem lab write-up', done: false, day: t },
+    { id: uid(), text: 'read ch. 7 of the great gatsby', done: false, day: t },
+    { id: uid(), text: 'spanish subjunctive flashcards', done: false, day: t },
+    { id: uid(), text: 'email ms. alvarez about the extension', done: true, day: t },
+    { id: uid(), text: 'calc problem set 4.3', done: false, day: t1 },
+    { id: uid(), text: 'history essay outline', done: false, day: t2 },
+    { id: uid(), text: 'bio worksheet, ch. 8', done: true, day: y }
+  ];
+}
+function seedHistory() {
+  const out = [];
+  [[0, [25, 25]], [1, [25, 25, 25, 25]], [2, [25, 25]], [3, [50, 25]], [4, [25]], [5, [25, 25, 25]], [7, [25]]].forEach(([ago, mins]) =>
+    mins.forEach((m, i) => { const d = addDays(new Date(), -ago); d.setHours(19 + i, 10, 0, 0); out.push({ id: uid(), at: d.toISOString(), day: dayKey(d), minutes: m, sample: true }); }));
+  return out;
+}
+function seedChats() {
+  const now = Date.now();
+  return [
+    { id: 'c1', title: 'photosynthesis, ch. 8', updated: now - 36e5, messages: [
+      { id: 'm1', role: 'user', sample: true, text: 'can you explain question 3? i keep mixing up the light-dependent and light-independent reactions', files: [{ id: 'f1', name: 'bio_worksheet_ch8.jpg', type: 'image/jpeg', size: 482113 }] },
+      { id: 'm2', role: 'ai', sample: true, kind: 'text', text: "Think of it as two stations inside the same chloroplast.\n\n**Light-dependent reactions** happen in the thylakoid membranes. Light splits water, releases O₂, and charges up ATP and NADPH.\n\n**Light-independent reactions** (the Calvin cycle) happen in the stroma. They spend that ATP and NADPH to turn CO₂ into sugar (G3P).\n\nFor question 3: the first stage makes the energy carriers, the second spends them. Want flashcards on this?" }
+    ] },
+    { id: 'c2', title: 'gatsby ch. 7, themes', updated: now - 864e5, messages: [
+      { id: 'm3', role: 'user', sample: true, text: 'what does the heat mean in chapter 7?' },
+      { id: 'm4', role: 'ai', sample: true, kind: 'text', text: 'The heat builds with the tension. It is the hottest day of the summer, and tempers rise until the confrontation at the Plaza Hotel breaks it open.' }
+    ] },
+    { id: 'c3', title: 'spanish subjunctive', updated: now - 3 * 864e5, messages: [
+      { id: 'm5', role: 'user', sample: true, text: 'when do i use the subjunctive after "espero que"?' },
+      { id: 'm6', role: 'ai', sample: true, kind: 'text', text: 'Always. "Esperar que" expresses a hope about someone else, so the verb after it takes the subjunctive: **espero que vengas**.' }
+    ] }
+  ];
+}
+
+/* ---------- demo tutor (no AI connected yet) ---------- */
+const SAMPLE_CARDS = [
+  { q: 'Where do the light-dependent reactions happen?', a: 'In the thylakoid membranes of the chloroplast.' },
+  { q: 'What does the Calvin cycle produce?', a: 'G3P, a 3-carbon sugar, built from CO₂ using ATP and NADPH.' },
+  { q: 'Which molecule is split to release oxygen?', a: 'Water (H₂O), at photosystem II.' },
+  { q: 'Which enzyme fixes CO₂ in the Calvin cycle?', a: 'Rubisco.' },
+  { q: 'What carries energy from the light reactions to the Calvin cycle?', a: 'ATP and NADPH.' }
+];
+const SAMPLE_QUIZ = [
+  { q: 'Where in the chloroplast does the Calvin cycle take place?', opts: ['thylakoid membrane', 'stroma', 'outer membrane', 'thylakoid lumen'], a: 1, why: 'The Calvin cycle runs in the stroma, the fluid around the thylakoids.' },
+  { q: 'Which molecule is split to release O₂?', opts: ['CO₂', 'glucose', 'H₂O', 'NADPH'], a: 2, why: 'Water is split at photosystem II, and its oxygen leaves as O₂.' },
+  { q: 'Which two products of the light reactions power the Calvin cycle?', opts: ['ATP and NADPH', 'O₂ and glucose', 'CO₂ and H₂O', 'ADP and NADP⁺'], a: 0, why: 'ATP supplies the energy and NADPH supplies the electrons.' }
+];
+const ACTIONS = [
+  { id: 'flashcards', label: 'flashcards', prompt: 'make flashcards from this' },
+  { id: 'quiz', label: 'practice test', prompt: 'give me a short practice test' },
+  { id: 'explain', label: 'explain', prompt: 'explain this simply' },
+  { id: 'summary', label: 'summarize', prompt: 'summarize the key points' }
+];
+function demoReply({ text, action, fileNames }) {
+  const t = (text || '').toLowerCase();
+  const kind = action || (/flash ?cards?/.test(t) ? 'flashcards' : /quiz|test|practice/.test(t) ? 'quiz' : /summar/.test(t) ? 'summary' : /explain/.test(t) ? 'explain' : null);
+  const base = { id: uid(), role: 'ai', demo: true };
+  if (kind === 'flashcards') return { ...base, kind: 'flashcards', text: 'Five cards on photosynthesis. Tap a card to flip it.', cards: SAMPLE_CARDS };
+  if (kind === 'quiz') return { ...base, kind: 'quiz', text: 'Three questions. Pick an answer to check it.', questions: SAMPLE_QUIZ };
+  if (kind === 'summary') return { ...base, kind: 'text', text: "Photosynthesis in four lines:\n\n- Light hits chlorophyll in the thylakoids and splits water, releasing O₂.\n- That energy is stored as ATP and NADPH.\n- In the stroma, the Calvin cycle uses them to fix CO₂ with rubisco.\n- The output is G3P, which the plant builds into glucose." };
+  if (kind === 'explain') return { ...base, kind: 'text', text: "Picture a solar-powered bakery.\n\nThe **light reactions** are the solar panels: they take in light and water, give off oxygen, and charge the batteries (ATP and NADPH).\n\nThe **Calvin cycle** is the kitchen: it uses those charged batteries to turn CO₂ into sugar. No charged batteries, no baking." };
+  const files = fileNames.length ? fileNames.map(n => `“${n}”`).join(', ') : null;
+  return { ...base, kind: 'text', text: `I'm in demo mode, so I can't read ${files || 'your question'} or answer it properly yet.\n\nOnce the tutor is connected on the server, I'll answer from your own files and keep this conversation saved to your account. For now, the quick actions show what flashcards and practice tests will look like.` };
+}
+
+/* ---------- app state ---------- */
+const AppCtx = createContext(null);
+const useApp = () => useContext(AppCtx);
+
+function usePlayer() {
+  const [plId, setPlId] = useState('p1');
+  const [order, setOrder] = useState(PLAYLISTS[0].ids);
+  const [pos, setPos] = useState(0);
+  const [playing, setPlaying] = useState(true);
+  const [t, setT] = useState(71);
+  const [shuffle, setShuffle] = useState(false);
+  const [repeat, setRepeat] = useState('off');
+  const [volume, setVolume] = useState(.7);
+  const track = TRACK[order[pos]];
+
+  useEffect(() => {
+    if (!playing) return;
+    const id = setInterval(() => setT(x => x + .25), 250);
+    return () => clearInterval(id);
+  }, [playing]);
+
+  const advance = (dir, auto) => {
+    if (shuffle && dir > 0 && order.length > 1) {
+      let n = pos; while (n === pos) n = Math.floor(Math.random() * order.length);
+      setPos(n); setT(0); return;
+    }
+    let n = pos + dir;
+    if (n >= order.length) { n = 0; if (auto && repeat === 'off') setPlaying(false); }
+    if (n < 0) n = order.length - 1;
+    setPos(n); setT(0);
+  };
+  useEffect(() => { if (t >= track.dur) { if (repeat === 'one') setT(0); else advance(1, true); } });
+
+  return {
+    track, order, pos, playing, t, shuffle, repeat, volume, plId,
+    playlist: PLAYLISTS.find(p => p.id === plId),
+    upNext: TRACK[order[(pos + 1) % order.length]],
+    toggle: () => setPlaying(p => !p),
+    next: () => advance(1, false),
+    prev: () => { if (t > 3) setT(0); else advance(-1, false); },
+    seek: s => setT(Math.max(0, Math.min(track.dur - .5, s))),
+    toggleShuffle: () => setShuffle(s => !s),
+    cycleRepeat: () => setRepeat(r => r === 'off' ? 'all' : r === 'all' ? 'one' : 'off'),
+    setVolume,
+    playTrack: (pid, id) => { const pl = PLAYLISTS.find(p => p.id === pid); setPlId(pid); setOrder(pl.ids); setPos(pl.ids.indexOf(id)); setT(0); setPlaying(true); }
+  };
+}
+
+function useTimer(settings, onFocusDone) {
+  const [mode, setMode] = useState('focus');
+  const [running, setRunning] = useState(false);
+  const [remaining, setRemaining] = useState(settings.focus * 60);
+  const [cycle, setCycle] = useState(0);
+  const endRef = useRef(0);
+  const total = settings[mode] * 60;
+  const L = useRef({}); L.current = { mode, settings, cycle, onFocusDone };
+
+  const prevTotal = useRef(total);
+  useEffect(() => { if (prevTotal.current !== total) { prevTotal.current = total; if (!running) setRemaining(total); } }, [total]);
+
+  const advance = (log) => {
+    const { mode, settings, cycle, onFocusDone } = L.current;
+    let next, c = cycle;
+    if (mode === 'focus') {
+      if (log) onFocusDone(settings.focus);
+      c = cycle + 1;
+      next = c >= settings.every ? 'long' : 'short';
+      if (c >= settings.every) c = 0;
+    } else next = 'focus';
+    setCycle(c); setRunning(false); setMode(next); setRemaining(settings[next] * 60);
+  };
+
+  useEffect(() => {
+    if (!running) return;
+    const id = setInterval(() => {
+      const r = Math.max(0, Math.ceil((endRef.current - Date.now()) / 1000));
+      setRemaining(r);
+      if (r <= 0) { clearInterval(id); if (L.current.settings.chime) chime(); advance(true); }
+    }, 200);
+    return () => clearInterval(id);
+  }, [running]);
+
+  const start = () => { unlockAudio(); endRef.current = Date.now() + remaining * 1000; setRunning(true); };
+  const pause = () => setRunning(false);
+  return {
+    mode, running, remaining, total, cycle, frac: 1 - remaining / total,
+    start, pause, toggle: () => (running ? pause() : start()),
+    reset: () => { setRunning(false); setRemaining(total); },
+    skip: () => advance(false),
+    switchMode: m => { setRunning(false); setMode(m); setRemaining(settings[m] * 60); }
+  };
+}
+const MODE_LABEL = { focus: 'focus', short: 'short break', long: 'long break' };
+
+const PREVIEWS = {};
+
+function AppProvider({ children }) {
+  const [settings, setSettings] = usePersist('settings', { focus: 25, short: 5, long: 15, every: 4, chime: true, goal: 120 });
+  const [tasks, setTasks] = usePersist('tasks', seedTasks);
+  const [history, setHistory] = usePersist('history', seedHistory);
+  const [chats, setChats] = usePersist('chats', seedChats);
+  const [chatId, setChatId] = usePersist('chatId', 'c1');
+  const [grain, setGrain] = usePersist('grain', true);
+  const [pending, setPending] = useState(false);
+  const [page, setPage] = useState(() => { const h = location.hash.slice(1); return ['home', 'focus', 'music', 'ai', 'planner'].includes(h) ? h : 'home'; });
+
+  const logSession = useCallback(minutes => {
+    const d = new Date();
+    setHistory(h => [...h, { id: uid(), at: d.toISOString(), day: dayKey(d), minutes }]);
+  }, []);
+  const timer = useTimer(settings, logSession);
+  const player = usePlayer();
+
+  const go = p => { setPage(p); try { history.replaceState(null, '', '#' + p); } catch (e) {} window.scrollTo({ top: 0, behavior: 'smooth' }); };
+
+  const sendChat = (cid, { text, files, action }) => {
+    const now = Date.now();
+    const act = ACTIONS.find(a => a.id === action);
+    const userMsg = { id: uid(), role: 'user', text: text || (act ? act.prompt : ''), files: files.map(({ id, name, type, size }) => ({ id, name, type, size })) };
+    const chat = chats.find(c => c.id === cid);
+    const fileNames = [...(chat ? chat.messages : []), userMsg].flatMap(m => (m.files || []).map(f => f.name)).slice(-3);
+    setChats(cs => cs.map(c => c.id === cid ? {
+      ...c, updated: now, messages: [...c.messages, userMsg],
+      title: c.title === 'new conversation' && (text || files[0]) ? (text || files[0].name).slice(0, 40) : c.title
+    } : c));
+    setPending(true);
+    setTimeout(() => {
+      const reply = demoReply({ text, action, fileNames: files.length ? files.map(f => f.name) : (text ? [] : fileNames) });
+      setChats(cs => cs.map(c => c.id === cid ? { ...c, messages: [...c.messages, reply] } : c));
+      setPending(false);
+    }, 900 + Math.random() * 600);
+  };
+  const newChat = () => { const c = { id: uid(), title: 'new conversation', updated: Date.now(), messages: [] }; setChats(cs => [c, ...cs]); setChatId(c.id); };
+  const deleteChat = id => setChats(cs => { const rest = cs.filter(c => c.id !== id); if (id === chatId && rest[0]) setChatId(rest[0].id); return rest.length ? rest : seedChats(); });
+  const resetSamples = () => { setTasks(seedTasks()); setHistory(seedHistory()); setChats(seedChats()); setChatId('c1'); };
+
+  useEffect(() => {
+    document.title = timer.running ? `${mmss(timer.remaining)} · ${MODE_LABEL[timer.mode]} — slaveaway.` : 'slaveaway.';
+  }, [timer.running, timer.remaining, timer.mode]);
+
+  const value = { settings, setSettings, tasks, setTasks, history, setHistory, chats, setChats, chatId, setChatId, grain, setGrain, pending, sendChat, newChat, deleteChat, resetSamples, timer, player, page, go };
+  return <AppCtx.Provider value={value}>{children}</AppCtx.Provider>;
+}
+
+/* ---------- icons (thin strokes) ---------- */
+const sv = { fill: 'none', stroke: 'currentColor', strokeWidth: 1.3, strokeLinecap: 'round', strokeLinejoin: 'round', viewBox: '0 0 24 24', 'aria-hidden': true };
+const I = {
+  play: <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.5 5.8v12.4L18.6 12z" fill="currentColor" /></svg>,
+  pause: <svg viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="5.5" width="3" height="13" fill="currentColor" /><rect x="14" y="5.5" width="3" height="13" fill="currentColor" /></svg>,
+  next: <svg {...sv}><path d="M6.5 6.5l8.5 5.5-8.5 5.5z" fill="currentColor" stroke="none" /><path d="M17.5 6v12" /></svg>,
+  prev: <svg {...sv}><path d="M17.5 6.5L9 12l8.5 5.5z" fill="currentColor" stroke="none" /><path d="M6.5 6v12" /></svg>,
+  shuffle: <svg {...sv}><path d="M3 7h3.5c2 0 3.2 1 4.3 2.6l2.4 3.8C14.3 15 15.5 16 17.5 16H21M18 13l3 3-3 3M3 16h3.5c1.3 0 2.2-.4 3-1.2M13.5 8.2c.8-.8 1.7-1.2 3-1.2H21M18 4l3 3-3 3" /></svg>,
+  repeat: <svg {...sv}><path d="M4 11V9a3 3 0 0 1 3-3h12M16 3l3 3-3 3M20 13v2a3 3 0 0 1-3 3H5M8 21l-3-3 3-3" /></svg>,
+  vol: <svg {...sv}><path d="M4 9.5h3l4.5-3.5v12L7 14.5H4z" /><path d="M15 9a4 4 0 0 1 0 6M17.5 6.5a7.5 7.5 0 0 1 0 11" /></svg>,
+  send: <svg {...sv}><path d="M4 12h15M13 6l6 6-6 6" /></svg>,
+  check: <svg viewBox="0 0 10 10" aria-hidden="true"><path d="M1.5 5.2l2.2 2.2 4.8-5" fill="none" stroke="rgb(234 224 213)" strokeWidth="1.4" /></svg>
+};
+
+/* ---------- shared bits ---------- */
+function SectionHead({ title, script, meta, children }) {
+  return (
+    <div className="sh">
+      <h2>{title}{script && <span className="script">{script}</span>}</h2>
+      <div className="flex items-center gap-3 flex-wrap">{meta && <span className="mono-s">{meta}</span>}{children}</div>
+    </div>
+  );
+}
+function Grain() { const { grain } = useApp(); return grain ? <div className="grain" aria-hidden="true" /> : null; }
+
+/* ---------- header ---------- */
+const PAGES = ['home', 'focus', 'music', 'ai', 'planner'];
+function Header() {
+  const { page, go, player, timer } = useApp();
+  return (
+    <header className="hdr">
+      <div className="wrap hdr-in">
+        <button className="brand" onClick={() => go('home')} aria-label="slaveaway. home">slaveaway<span className="dot">.</span></button>
+        <span className="brand-sub" aria-hidden="true">study &amp; sound</span>
+        <span className="brand-sep" aria-hidden="true" />
+        <nav className="nav" aria-label="main">
+          {PAGES.map(p => (
+            <button key={p} className={'nav-i' + (page === p ? ' on' : '')} onClick={() => go(p)} aria-current={page === p ? 'page' : undefined}>
+              {p}
+              {page === p && <motion.span layoutId="navdot" className="nav-dot" transition={{ type: 'spring', stiffness: 520, damping: 40 }} />}
+            </button>
+          ))}
+        </nav>
+        <div className="hdr-right">
+          <div className="status">
+            {timer.running && <span>{MODE_LABEL[timer.mode]} {mmss(timer.remaining)}</span>}
+            {player.playing && page !== 'home' && page !== 'music' && (
+              <span className="flex items-center gap-2 min-w-0"><img className="mini-disc" src={player.track.cover} alt="" /><span className="np">{player.track.title}</span></span>
+            )}
+          </div>
+          <Connections />
+        </div>
+      </div>
+    </header>
+  );
+}
+function Connections() {
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+  useEffect(() => {
+    if (!open) return;
+    const f = e => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    const k = e => { if (e.key === 'Escape') setOpen(false); };
+    document.addEventListener('pointerdown', f); document.addEventListener('keydown', k);
+    return () => { document.removeEventListener('pointerdown', f); document.removeEventListener('keydown', k); };
+  }, [open]);
+  return (
+    <div className="relative" ref={ref}>
+      <button className="btn" onClick={() => setOpen(o => !o)} aria-expanded={open}>connect</button>
+      <AnimatePresence>
+        {open && (
+          <motion.div className="pop" initial={{ opacity: 0, y: -6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -6 }} transition={{ duration: .25, ease: EASE }}>
+            <div className="mono-s mb-3">connections · prototype</div>
+            <div className="pop-row"><span className="sdot demo" /><h4>spotify</h4>
+              <p>Not connected. The records here are invented samples with no audio. Spotify sign-in comes next, and controlling playback needs Spotify Premium.</p></div>
+            <div className="pop-row"><span className="sdot" /><h4>google account</h4>
+              <p>Not signed in. Until sign-in is added, your tasks, sessions and chats are saved in this browser only.</p></div>
+            <div className="pop-row"><span className="sdot demo" /><h4>study tutor</h4>
+              <p>Demo replies. The real tutor will run on a server, so the API key never reaches your browser.</p></div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- CD player ---------- */
+function useSpin(ref, playing) {
+  const on = useRef(playing); on.current = playing;
+  useEffect(() => {
+    const reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+    let raf, last = performance.now(), angle = Math.random() * 360, vel = on.current ? (reduce ? 30 : 160) : 0;
+    const loop = now => {
+      const dt = Math.min(.05, (now - last) / 1000); last = now;
+      const target = on.current ? (reduce ? 30 : 160) : 0;
+      vel += (target - vel) * Math.min(1, dt * (on.current ? 1.4 : 1.9));
+      angle = (angle + vel * dt) % 360;
+      if (ref.current) ref.current.style.transform = `rotate(${angle.toFixed(2)}deg)`;
+      raf = requestAnimationFrame(loop);
+    };
+    raf = requestAnimationFrame(loop);
+    return () => cancelAnimationFrame(raf);
+  }, []);
+}
+
+function Disc({ track, playing, uidKey }) {
+  const spin = useRef(null);
+  useSpin(spin, playing);
+  const ringId = 'ring-' + uidKey;
+  return (
+    <div className="disc" aria-hidden="true">
+      <div className="disc-body">
+        <div className="disc-spin" ref={spin}>
+          <AnimatePresence initial={false}>
+            <motion.img key={track.id} src={track.cover} alt="" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: .7 }} />
+          </AnimatePresence>
+          <div className="disc-grooves" />
+          <div className="disc-hub" />
+          <svg className="disc-ring-text" viewBox="0 0 100 100">
+            <defs><path id={ringId} d="M50,50 m-21.5,0 a21.5,21.5 0 1,1 43,0 a21.5,21.5 0 1,1 -43,0" /></defs>
+            <text fontSize="2.3" letterSpacing=".55" fill="rgba(234,224,213,.82)" fontFamily="DM Mono, monospace">
+              <textPath href={'#' + ringId}>{`${track.cat} · ${track.artist.toUpperCase()} · ${track.album.toUpperCase()} · STEREO · SLAVEAWAY RECORDS ·`}</textPath>
+            </text>
+          </svg>
+        </div>
+        <div className="disc-irid" />
+        <div className="disc-sheen" />
+        <div className="disc-rim" />
+      </div>
+    </div>
+  );
+}
+
+function Sleeve({ track }) {
+  return (
+    <div className="sleeve">
+      <div className="spine"><span>{track.cat} · {track.artist} · {track.album}</span></div>
+      <div className="face">
+        <AnimatePresence initial={false}>
+          <motion.img key={track.id} src={track.cover} alt={`${track.album} by ${track.artist}, sample cover art`} initial={{ opacity: 0, scale: 1.04 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0 }} transition={{ duration: .7, ease: EASE }} />
+        </AnimatePresence>
+      </div>
+    </div>
+  );
+}
+
+function Levels({ playing }) {
+  const bars = useMemo(() => Array.from({ length: 21 }, (_, i) => .22 + .78 * Math.abs(Math.sin(i * 1.7) * Math.cos(i * .6))), []);
+  return <div className={'levels' + (playing ? ' on' : '')} aria-hidden="true">{bars.map((h, i) => <span key={i} style={{ '--h': h, '--d': ((i * 137) % 600) + 'ms' }} />)}</div>;
+}
+
+function Stage({ variant }) {
+  const { player: p } = useApp();
+  const t = p.track;
+  return (
+    <div className={'stage' + (p.playing ? ' playing' : '')}>
+      <span className="reg" style={{ top: 40, left: 18 }} /><span className="reg" style={{ top: 40, right: 18 }} />
+      <span className="stage-lbl tl"><span className="live" />{p.playing ? 'now spinning' : 'paused'}</span>
+      <span className="stage-lbl tr">{t.cat} · {t.year}</span>
+      <span className="stage-lbl bl">cd · stereo · 44.1 khz</span>
+      <span className="stage-lbl br"><Levels playing={p.playing} /></span>
+      <div className="art">
+        <Disc track={t} playing={p.playing} uidKey={variant} />
+        <Sleeve track={t} />
+      </div>
+    </div>
+  );
+}
+
+function TrackTitle({ track }) {
+  const ty = typeFor(track);
+  return (
+    <div className="title-wrap">
+      <AnimatePresence mode="wait" initial={false}>
+        <motion.h2 key={track.id} className="track-title"
+          style={{ fontFamily: ty.family, fontStyle: ty.style, fontWeight: ty.weight, textTransform: ty.transform, letterSpacing: ty.tracking, fontSize: `calc(var(--title) * ${ty.scale})` }}
+          initial={{ opacity: 0, y: 14, filter: 'blur(8px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -8, filter: 'blur(6px)' }}
+          transition={{ duration: .55, ease: EASE }}>
+          {track.title}
+        </motion.h2>
+      </AnimatePresence>
+      <div className="mono-s type-credit">set in {ty.font} · {ty.license}</div>
+    </div>
+  );
+}
+
+function Progress() {
+  const { player: p } = useApp();
+  const frac = Math.min(1, p.t / p.track.dur);
+  return (
+    <div className="prog">
+      <span>{mss(p.t)}</span>
+      <div className="bar">
+        <div className="bar-fill" style={{ transform: `scaleX(${frac})` }} />
+        <div className="bar-knob" style={{ left: frac * 100 + '%' }} />
+        <input type="range" aria-label="seek" min="0" max={p.track.dur} step="1" value={Math.floor(p.t)} onChange={e => p.seek(+e.target.value)} />
+      </div>
+      <span>{mss(p.track.dur)}</span>
+    </div>
+  );
+}
+
+function Controls() {
+  const { player: p } = useApp();
+  return (
+    <div className="ctrls">
+      <button className={'ib' + (p.shuffle ? ' on' : '')} onClick={p.toggleShuffle} aria-label="shuffle" aria-pressed={p.shuffle}>{I.shuffle}</button>
+      <button className="ib" onClick={p.prev} aria-label="previous track">{I.prev}</button>
+      <motion.button className="playbtn" whileTap={{ scale: .93 }} onClick={p.toggle} aria-label={p.playing ? 'pause' : 'play'}>{p.playing ? I.pause : I.play}</motion.button>
+      <button className="ib" onClick={p.next} aria-label="next track">{I.next}</button>
+      <button className={'ib' + (p.repeat !== 'off' ? ' on' : '')} onClick={p.cycleRepeat} aria-label={'repeat: ' + p.repeat}>{I.repeat}{p.repeat === 'one' && <sup>1</sup>}</button>
+      <label className="vol">
+        {I.vol}<span className="sr-only">volume</span>
+        <input id="volume" className="thin-range" type="range" min="0" max="1" step=".01" value={p.volume} style={{ '--v': p.volume * 100 + '%' }} onChange={e => p.setVolume(+e.target.value)} />
+      </label>
+    </div>
+  );
+}
+
+function CDPlayer({ variant = 'home' }) {
+  const { player: p, go } = useApp();
+  const t = p.track;
+  return (
+    <div className={'cdp cdp-' + variant}>
+      <Stage variant={variant} />
+      <div className="cdp-meta">
+        <div className="flex items-baseline justify-between gap-3 flex-wrap">
+          <span className="mono-s">track {pad(p.pos + 1)} / {pad(p.order.length)} — {p.playlist.name}</span>
+          <span className="tag">sample record · no audio</span>
+        </div>
+        <TrackTitle track={t} />
+        <div className="by"><span className="artist">{t.artist}</span><span className="album">from <i>{t.album}</i>, {t.year}</span></div>
+        <Progress />
+        <Controls />
+        {variant === 'home' && (
+          <div className="upnext">
+            <span className="mono-s">up next — <span className="t">{p.upNext.title}</span>, {p.upNext.artist}</span>
+            <button className="link" onClick={() => go('music')}>browse playlists</button>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ---------- pomodoro ---------- */
+function Digits({ value, className }) {
+  return (
+    <div className={'digits ' + (className || '')} role="timer" aria-label={value}>
+      {value.split('').map((ch, i) => ch === ':' ? <span key={'c' + i} className="colon" aria-hidden="true">:</span> : (
+        <span key={i} className="dg" aria-hidden="true">
+          <AnimatePresence initial={false} mode="popLayout">
+            <motion.span key={ch} initial={{ y: '-70%', opacity: 0, filter: 'blur(3px)' }} animate={{ y: '0%', opacity: 1, filter: 'blur(0px)' }} exit={{ y: '70%', opacity: 0, filter: 'blur(3px)' }} transition={{ duration: .42, ease: EASE }}>{ch}</motion.span>
+          </AnimatePresence>
+        </span>
+      ))}
+    </div>
+  );
+}
+function Ruler({ minutes, frac }) {
+  const n = Math.max(1, Math.min(minutes, 60));
+  const every = n > 30 ? 10 : 5;
+  return (
+    <div className="ruler" aria-hidden="true">
+      <div className="ruler-ticks">
+        {Array.from({ length: n + 1 }, (_, i) => (
+          <span key={i} className={'tick' + (i % every === 0 ? ' major' : '') + (i / n <= frac && frac > 0 ? ' on' : '')}>{i % every === 0 && <em>{Math.round(i * minutes / n)}</em>}</span>
+        ))}
+      </div>
+      <div className="needle" style={{ left: Math.min(100, frac * 100) + '%' }} />
+    </div>
+  );
+}
+const PHRASES = { focus: ['stay with it', 'one page at a time'], short: ['breathe'], long: ['go get some water'] };
+function Pomodoro({ variant = 'compact' }) {
+  const { timer: tm, settings, setSettings } = useApp();
+  const [adjust, setAdjust] = useState(false);
+  const filled = tm.mode === 'long' ? settings.every : tm.cycle;
+  const phrase = tm.mode === 'focus' ? PHRASES.focus[tm.running ? 0 : 1] : PHRASES[tm.mode][0];
+  const step = (k, d, min, max) => setSettings(s => ({ ...s, [k]: Math.max(min, Math.min(max, s[k] + d)) }));
+  return (
+    <div className={'pomo pomo-' + variant + (tm.running ? ' running' : '')}>
+      <div className="pomo-modes" role="tablist" aria-label="timer mode">
+        {['focus', 'short', 'long'].map(m => <button key={m} role="tab" aria-selected={tm.mode === m} className={'pm' + (tm.mode === m ? ' on' : '')} onClick={() => tm.switchMode(m)}>{MODE_LABEL[m]}</button>)}
+      </div>
+      <div className="flex items-end justify-between gap-3 mt-4 flex-wrap">
+        <Digits value={mmss(tm.remaining)} className="pomo-digits" />
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.span key={phrase} className="pomo-script pb-3" initial={{ opacity: 0, x: 6 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0 }} transition={{ duration: .5 }}>{phrase}</motion.span>
+        </AnimatePresence>
+      </div>
+      <Ruler minutes={settings[tm.mode]} frac={tm.frac} />
+      <div className="flex items-center gap-2 mt-4 flex-wrap">
+        <button className="btn primary" onClick={tm.toggle}>{tm.running ? 'pause' : tm.remaining < tm.total ? 'resume' : 'start'}</button>
+        <button className="btn" onClick={tm.reset}>reset</button>
+        <button className="btn ghost" onClick={tm.skip}>skip</button>
+        <div className="ml-auto flex items-center gap-3">
+          <span className="cycle" title={`session ${Math.min(filled + 1, settings.every)} of ${settings.every}`}>{Array.from({ length: settings.every }, (_, i) => <i key={i} className={i < filled ? 'on' : ''} />)}</span>
+        </div>
+      </div>
+      <div className="flex items-center justify-between mt-4">
+        <span className="mono-s">long break after {settings.every} sessions</span>
+        <button className="link" onClick={() => setAdjust(a => !a)} aria-expanded={adjust}>{adjust ? 'done' : 'adjust'}</button>
+      </div>
+      <AnimatePresence initial={false}>
+        {adjust && (
+          <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} transition={{ duration: .35, ease: EASE }} style={{ overflow: 'hidden' }}>
+            <div className="adjust mt-3">
+              {[['focus', 'focus', 5, 90, 5], ['short', 'short break', 1, 30, 1], ['long', 'long break', 5, 45, 5], ['every', 'sessions per cycle', 2, 8, 1], ['goal', 'daily goal (min)', 30, 480, 30]].map(([k, l, min, max, d]) => (
+                <div key={k} className="stepper">
+                  <span className="mono-s">{l}</span>
+                  <span className="flex items-center gap-2">
+                    <button onClick={() => step(k, -d, min, max)} aria-label={'decrease ' + l}>−</button>
+                    <span className="v">{settings[k]}</span>
+                    <button onClick={() => step(k, d, min, max)} aria-label={'increase ' + l}>+</button>
+                  </span>
+                </div>
+              ))}
+              <div className="stepper">
+                <span className="mono-s">chime when done</span>
+                <span className="flex items-center gap-3">
+                  <button className="link" style={{ width: 'auto', height: 'auto', border: 0 }} onClick={() => setSettings(s => ({ ...s, chime: !s.chime }))}>{settings.chime ? 'on' : 'off'}</button>
+                  <button className="link" style={{ width: 'auto', height: 'auto', border: 0 }} onClick={chime}>listen</button>
+                </span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+/* ---------- tasks ---------- */
+function TaskItem({ task }) {
+  const { setTasks } = useApp();
+  const toggle = () => setTasks(ts => ts.map(x => x.id === task.id ? { ...x, done: !x.done } : x));
+  return (
+    <motion.li layout className={'task' + (task.done ? ' done' : '')} initial={{ opacity: 0, y: 6 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, height: 0, paddingTop: 0, paddingBottom: 0 }} transition={{ duration: .3, ease: EASE }}>
+      <button className="chk" onClick={toggle} role="checkbox" aria-checked={task.done} aria-label={task.text}>{I.check}</button>
+      <span className="ttext" onClick={toggle}>{task.text}</span>
+      <button className="tdel" onClick={() => setTasks(ts => ts.filter(x => x.id !== task.id))} aria-label={'delete ' + task.text}>×</button>
+    </motion.li>
+  );
+}
+function AddTask({ day, id, placeholder = 'add a task…' }) {
+  const { setTasks } = useApp();
+  const [v, setV] = useState('');
+  return (
+    <form onSubmit={e => { e.preventDefault(); const t = v.trim(); if (!t) return; setTasks(ts => [...ts, { id: uid(), text: t, done: false, day }]); setV(''); }}>
+      <label htmlFor={id} className="sr-only">add a task</label>
+      <input id={id} className="add" value={v} onChange={e => setV(e.target.value)} placeholder={placeholder} autoComplete="off" />
+    </form>
+  );
+}
+function Tasks({ idPrefix = 'home' }) {
+  const { tasks } = useApp();
+  const today = dayKey();
+  const list = tasks.filter(t => t.day === today);
+  const done = list.filter(t => t.done).length;
+  const d = new Date();
+  return (
+    <div>
+      <div className="flex items-baseline justify-between mb-2">
+        <h3 className="font-display italic text-[1.45rem] leading-none">today</h3>
+        <span className="mono-s">{DOW[(d.getDay() + 6) % 7]} {d.getDate()} {d.toLocaleString('en', { month: 'short' }).toLowerCase()} · {done} of {list.length} done</span>
+      </div>
+      <ul><AnimatePresence initial={false}>{list.map(t => <TaskItem key={t.id} task={t} />)}</AnimatePresence></ul>
+      <AddTask day={today} id={'add-today-' + idPrefix} />
+    </div>
+  );
+}
+
+/* ---------- streak ---------- */
+function useStats() {
+  const { history } = useApp();
+  return useMemo(() => {
+    const by = {};
+    history.forEach(h => { by[h.day] = (by[h.day] || 0) + h.minutes; });
+    const today = dayKey();
+    let streak = 0, d = new Date();
+    if (!by[today]) d = addDays(d, -1);
+    while (by[dayKey(d)]) { streak++; d = addDays(d, -1); }
+    const ws = weekStart();
+    const week = DOW.map((label, i) => { const dd = addDays(ws, i), k = dayKey(dd); return { k, label, date: dd.getDate(), min: by[k] || 0, today: k === today }; });
+    return { by, today: by[today] || 0, streak, week, weekTotal: week.reduce((a, b) => a + b.min, 0), sample: history.some(h => h.sample), sessionsToday: history.filter(h => h.day === today).length };
+  }, [history]);
+}
+function Streak() {
+  const { settings } = useApp();
+  const s = useStats();
+  const max = Math.max(settings.goal, ...s.week.map(w => w.min));
+  return (
+    <div>
+      <div className="flex items-end justify-between gap-4">
+        <div className="streak-n">{s.streak}<span className="streak-u">day streak</span></div>
+        <div className="text-right">
+          <div className="mono-s">today</div>
+          <div className="streak-today">{fmtMin(s.today)} <span className="mono-s">/ {fmtMin(settings.goal)}</span></div>
+        </div>
+      </div>
+      <div className="goal-line"><div style={{ transform: `scaleX(${Math.min(1, s.today / settings.goal)})` }} /></div>
+      <div className="week">
+        {s.week.map(w => (
+          <div key={w.k} className={'wk' + (w.today ? ' today' : '')} title={`${w.label} ${w.date}: ${fmtMin(w.min)}`}>
+            <div className="wk-bar"><div style={{ height: (w.min / max * 100) + '%' }} /></div>
+            <span>{w.label.slice(0, 2)}</span>
+          </div>
+        ))}
+      </div>
+      {s.sample && <div className="mono-s mt-3">includes a sample week · clear it from the footer</div>}
+    </div>
+  );
+}
+
+/* ---------- chat ---------- */
+function inline(s) { return s.split(/\*\*(.+?)\*\*/g).map((part, i) => i % 2 ? <strong key={i}>{part}</strong> : part); }
+function Rich({ text }) {
+  return (
+    <div className="rich">
+      {text.split(/\n\n+/).map((b, i) => {
+        const lines = b.split('\n');
+        if (lines.every(l => l.startsWith('- '))) return <ul key={i}>{lines.map((l, j) => <li key={j}>{inline(l.slice(2))}</li>)}</ul>;
+        return <p key={i}>{inline(b)}</p>;
+      })}
+    </div>
+  );
+}
+function extOf(f) {
+  const m = /\.([a-z0-9]+)$/i.exec(f.name || '');
+  if (m) return m[1].slice(0, 4).toUpperCase();
+  return (f.type || '').startsWith('image/') ? 'IMG' : 'FILE';
+}
+function FileSlip({ f, onRemove }) {
+  const url = PREVIEWS[f.id];
+  return (
+    <span className="slip" title={f.name}>
+      {url ? <img src={url} alt="" /> : <span className="ext">{extOf(f)}</span>}
+      <span className="nm">{f.name}</span>
+      <span className="opacity-50 whitespace-nowrap">{kb(f.size || 0)}</span>
+      {onRemove && <button className="x" onClick={onRemove} aria-label={'remove ' + f.name}>×</button>}
+    </span>
+  );
+}
+function Flashcards({ cards }) {
+  const [i, setI] = useState(0);
+  const [flip, setFlip] = useState(false);
+  const c = cards[i];
+  const move = d => { setFlip(false); setTimeout(() => setI(x => (x + d + cards.length) % cards.length), flip ? 250 : 0); };
+  return (
+    <div className="fc">
+      <button className="fc-card" onClick={() => setFlip(f => !f)} aria-label={flip ? 'show question' : 'show answer'}>
+        <div className={'fc-inner' + (flip ? ' flipped' : '')}>
+          <div className="fc-face"><span className="lbl">QUESTION {i + 1}</span><p>{c.q}</p><span className="lbl" style={{ opacity: .6 }}>tap to flip</span></div>
+          <div className="fc-face back"><span className="lbl">ANSWER</span><p>{c.a}</p><span className="lbl" style={{ opacity: .6 }}>tap to flip back</span></div>
+        </div>
+      </button>
+      <div className="fc-nav"><button onClick={() => move(-1)}>← prev</button><span>{i + 1} / {cards.length}</span><button onClick={() => move(1)}>next →</button></div>
+    </div>
+  );
+}
+function Quiz({ questions }) {
+  const [picked, setPicked] = useState({});
+  const answered = Object.keys(picked).length;
+  const score = questions.filter((q, i) => picked[i] === q.a).length;
+  return (
+    <div className="quiz">
+      {questions.map((q, i) => (
+        <div key={i} className="q">
+          <h5>{i + 1}. {q.q}</h5>
+          {q.opts.map((o, j) => {
+            const done = picked[i] !== undefined;
+            const cls = done ? (j === q.a ? ' right' : j === picked[i] ? ' wrong' : '') : '';
+            return <button key={j} className={'opt' + cls} disabled={done} onClick={() => setPicked(p => ({ ...p, [i]: j }))}><b>{'abcd'[j]}.</b>{o}</button>;
+          })}
+          {picked[i] !== undefined && <p className="why">{q.why}</p>}
+        </div>
+      ))}
+      {answered === questions.length && <div className="mono-s pt-2">score · {score} / {questions.length}</div>}
+    </div>
+  );
+}
+function Message({ m }) {
+  return (
+    <motion.div className={'msg msg-' + m.role} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: .4, ease: EASE }}>
+      <div className="msg-who">{m.role === 'user' ? 'you' : 'tutor'}{m.demo && <span className="demo-mini">demo reply · sample content</span>}{m.sample && <span className="demo-mini">sample</span>}</div>
+      {m.files && m.files.length > 0 && <div className="slips">{m.files.map(f => <FileSlip key={f.id} f={f} />)}</div>}
+      {m.text && <Rich text={m.text} />}
+      {m.kind === 'flashcards' && <Flashcards cards={m.cards} />}
+      {m.kind === 'quiz' && <Quiz questions={m.questions} />}
+    </motion.div>
+  );
+}
+function Chat({ variant = 'home' }) {
+  const app = useApp();
+  const chat = app.chats.find(c => c.id === app.chatId) || app.chats[0];
+  const [draft, setDraft] = useState('');
+  const [files, setFiles] = useState([]);
+  const [drag, setDrag] = useState(false);
+  const scroller = useRef(null);
+  const ta = useRef(null);
+  useEffect(() => { const el = scroller.current; if (el) el.scrollTo({ top: el.scrollHeight, behavior: 'smooth' }); }, [chat && chat.messages.length, app.pending]);
+  useEffect(() => { const el = ta.current; if (!el) return; el.style.height = 'auto'; el.style.height = Math.min(120, el.scrollHeight) + 'px'; }, [draft]);
+
+  const addFiles = list => {
+    const arr = Array.from(list || []).slice(0, 6).map(file => {
+      const id = uid();
+      if ((file.type || '').startsWith('image/')) { try { PREVIEWS[id] = URL.createObjectURL(file); } catch (e) {} }
+      return { id, name: file.name || 'pasted-image.png', type: file.type, size: file.size };
+    });
+    setFiles(f => [...f, ...arr].slice(0, 8));
+  };
+  const send = action => {
+    if (app.pending || !chat) return;
+    const text = draft.trim();
+    if (!text && !files.length && !action) return;
+    app.sendChat(chat.id, { text, files, action });
+    setDraft(''); setFiles([]);
+  };
+  const fileInputId = 'chat-file-' + variant;
+  return (
+    <div className="chat" style={variant === 'full' ? { '--chat-h': 'max(560px, calc(100vh - 230px))' } : undefined}>
+      <div className="chat-head">
+        <h3>{chat ? chat.title : 'new conversation'}</h3>
+        <div className="flex items-center gap-3 flex-none">
+          <span className="tag">demo replies</span>
+          {variant === 'home' && <button className="link" onClick={() => app.go('ai')}>open</button>}
+        </div>
+      </div>
+      <div className="chat-scroll" ref={scroller}>
+        {chat && chat.messages.length === 0 && (
+          <div className="m-auto text-center max-w-[30ch]">
+            <p className="font-script text-[1.9rem] text-petal leading-none">ask me anything</p>
+            <p className="mono-s mt-3">drop in a worksheet photo, a pdf or your notes, then ask about it</p>
+          </div>
+        )}
+        {chat && chat.messages.map(m => <Message key={m.id} m={m} />)}
+        {app.pending && <div className="msg msg-ai"><div className="msg-who">tutor</div><div className="typing" aria-label="tutor is typing"><i /><i /><i /></div></div>}
+      </div>
+      <div className="qa" role="group" aria-label="quick study actions">
+        {ACTIONS.map(a => <button key={a.id} onClick={() => send(a.id)} disabled={app.pending}>{a.label}</button>)}
+      </div>
+      <div className={'composer' + (drag ? ' drag' : '')}
+        onDragOver={e => { e.preventDefault(); setDrag(true); }} onDragLeave={() => setDrag(false)}
+        onDrop={e => { e.preventDefault(); setDrag(false); addFiles(e.dataTransfer.files); }}>
+        {files.length > 0 && <div className="slips">{files.map(f => <FileSlip key={f.id} f={f} onRemove={() => setFiles(fs => fs.filter(x => x.id !== f.id))} />)}</div>}
+        <label htmlFor={'chat-input-' + variant} className="sr-only">message the tutor</label>
+        <textarea id={'chat-input-' + variant} ref={ta} rows={1} value={draft} onChange={e => setDraft(e.target.value)}
+          onKeyDown={e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } }}
+          onPaste={e => { if (e.clipboardData && e.clipboardData.files.length) { e.preventDefault(); addFiles(e.clipboardData.files); } }}
+          placeholder="ask about a worksheet, a chapter, a formula…" />
+        <div className="composer-row">
+          <label className="attach" htmlFor={fileInputId}>+ attach
+            <input id={fileInputId} className="sr-only" type="file" multiple accept="image/*,.pdf,.doc,.docx,.txt,.md,.rtf" onChange={e => { addFiles(e.target.files); e.target.value = ''; }} />
+          </label>
+          <span className="mono-s hidden sm:inline">images · pdf · docx · notes</span>
+          <button className="send" onClick={() => send()} aria-label="send" disabled={app.pending}>{I.send}</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- pages ---------- */
+function Home() {
+  return (
+    <div className="home-grid">
+      <section className="flex flex-col gap-12" aria-label="focus">
+        <div>
+          <SectionHead title="focus" meta={`pomodoro`} />
+          <Pomodoro />
+        </div>
+        <Tasks />
+        <Streak />
+      </section>
+      <section className="col-music" aria-label="music">
+        <SectionHead title="the record" script="on repeat" meta="side a" />
+        <CDPlayer variant="home" />
+      </section>
+      <section aria-label="study companion">
+        <SectionHead title="study companion" />
+        <Chat variant="home" />
+      </section>
+    </div>
+  );
+}
+
+function FocusPage() {
+  const { history } = useApp();
+  const s = useStats();
+  const todays = history.filter(h => h.day === dayKey()).slice().reverse();
+  return (
+    <div className="grid gap-14 lg:grid-cols-[minmax(0,1.5fr)_minmax(0,1fr)]">
+      <section className="min-w-0">
+        <SectionHead title="focus" script="one chapter at a time" meta="pomodoro" />
+        <Pomodoro variant="full" />
+      </section>
+      <section className="flex flex-col gap-12 min-w-0">
+        <Tasks idPrefix="focus" />
+        <Streak />
+        <div>
+          <div className="flex items-baseline justify-between mb-2"><h3 className="font-display italic text-[1.45rem] leading-none">today's sessions</h3><span className="mono-s">{s.sessionsToday} logged</span></div>
+          {todays.length === 0 && <p className="italic text-cream/60">Finish a focus session and it will show up here.</p>}
+          {todays.map(h => <div key={h.id} className="logrow"><span className="a">{new Date(h.at).toLocaleTimeString('en', { hour: 'numeric', minute: '2-digit' }).toLowerCase()}</span><span className="italic text-cream/75">focus{h.sample ? ' · sample' : ''}</span><span className="m">{h.minutes}m</span></div>)}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Crate() {
+  const { player: p } = useApp();
+  const [sel, setSel] = useState(p.plId);
+  const pl = PLAYLISTS.find(x => x.id === sel);
+  return (
+    <div>
+      <SectionHead title="the crate" meta="sample playlists" />
+      <div className="crate-tabs">
+        {PLAYLISTS.map(x => (
+          <button key={x.id} className={'ptab' + (sel === x.id ? ' on' : '')} onClick={() => setSel(x.id)} aria-pressed={sel === x.id}>
+            <div className="collage">{x.ids.slice(0, 4).map(id => <img key={id} src={TRACK[id].cover} alt="" />)}</div>
+            <h4>{x.name}</h4>
+            <span className="mono-s">{x.ids.length} tracks · {x.note}</span>
+          </button>
+        ))}
+      </div>
+      <div className="mt-8">
+        {pl.ids.map((id, i) => {
+          const t = TRACK[id];
+          const on = p.plId === pl.id && p.track.id === id;
+          return (
+            <button key={id} className={'trow' + (on ? ' on' : '')} onClick={() => p.playTrack(pl.id, id)}>
+              <span className="n">{on && p.playing ? <span className="eq"><i /><i /><i /></span> : pad(i + 1)}</span>
+              <img src={t.cover} alt="" />
+              <span className="min-w-0 flex flex-col gap-1"><span className="tt">{t.title}</span><span className="ta">{t.artist} · {t.album}</span></span>
+              <span className="d">{mss(t.dur)}</span>
+            </button>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+function TypeLibrary() {
+  return (
+    <div>
+      <SectionHead title="type library" meta="how song titles get their lettering" />
+      <p className="text-cream/75 max-w-[60ch] mb-5 leading-snug">Each record can carry its own lettering. The player matches artist and album first, then artist alone, and falls back to the house serif. Every face is an openly licensed alternative chosen to evoke the record, never a copy of an official album font.</p>
+      <div className="scroll-x">
+        <table className="typetable">
+          <thead><tr><th>record</th><th>title set in</th><th>why</th></tr></thead>
+          <tbody>
+            {TYPE_RULES.map((r, i) => (
+              <tr key={i}>
+                <td><span className="mono-s" style={{ color: 'rgb(var(--cream) / .75)' }}>{r.artist}{r.album ? ' — ' + r.album : ''}</span>{!r.sample && <div className="mono-s">activates with spotify</div>}</td>
+                <td><span className="sample" style={{ fontFamily: r.family, fontStyle: r.style || 'normal', fontWeight: r.weight || 400, textTransform: r.transform || 'none' }}>{r.font}</span></td>
+                <td className="why">{r.why}</td>
+              </tr>
+            ))}
+            <tr><td><span className="mono-s">everything else</span></td><td><span className="sample" style={{ fontFamily: DEFAULT_TYPE.family, fontStyle: 'italic' }}>Instrument Serif</span></td><td className="why">{DEFAULT_TYPE.why}</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  );
+}
+function MusicPage() {
+  return (
+    <div className="flex flex-col gap-20">
+      <div className="grid gap-14 xl:grid-cols-[minmax(0,1.3fr)_minmax(0,1fr)]">
+        <section className="min-w-0"><SectionHead title="music" script="late night rotation" /><CDPlayer variant="xl" /></section>
+        <section className="min-w-0"><Crate /></section>
+      </div>
+      <section className="min-w-0"><TypeLibrary /></section>
+    </div>
+  );
+}
+
+function AIPage() {
+  const app = useApp();
+  const [armed, setArmed] = useState(null);
+  const sorted = app.chats.slice().sort((a, b) => b.updated - a.updated);
+  return (
+    <div className="ai-grid">
+      <aside className="min-w-0">
+        <SectionHead title="notes" />
+        <button className="btn w-full mb-4" onClick={app.newChat}>new conversation</button>
+        {sorted.map(c => (
+          <div key={c.id} className={'convo' + (c.id === app.chatId ? ' on' : '')}>
+            <button className="ct text-left flex-1" onClick={() => app.setChatId(c.id)}>{c.title}</button>
+            {armed === c.id
+              ? <button className="link flex-none" onClick={() => { app.deleteChat(c.id); setArmed(null); }}>delete?</button>
+              : <button className="tdel flex-none" style={{ opacity: .5 }} onClick={() => setArmed(c.id)} aria-label={'delete ' + c.title}>×</button>}
+          </div>
+        ))}
+        <p className="mono-s mt-4">saved in this browser until google sign-in is added</p>
+      </aside>
+      <section className="min-w-0">
+        <SectionHead title="study companion" script="ask, upload, review" />
+        <Chat variant="full" />
+      </section>
+    </div>
+  );
+}
+
+function PlannerPage() {
+  const { tasks, history } = useApp();
+  const s = useStats();
+  const ws = weekStart();
+  const days = DOW.map((label, i) => { const d = addDays(ws, i); return { label, d, k: dayKey(d) }; });
+  const best = s.week.reduce((a, b) => b.min > a.min ? b : a, s.week[0]);
+  const recent = history.slice().sort((a, b) => b.at.localeCompare(a.at)).slice(0, 8);
+  return (
+    <div className="flex flex-col gap-16">
+      <section className="min-w-0">
+        <SectionHead title="this week" script="plan gently" meta={`${ws.getDate()} ${ws.toLocaleString('en', { month: 'short' }).toLowerCase()} — ${addDays(ws, 6).getDate()} ${addDays(ws, 6).toLocaleString('en', { month: 'short' }).toLowerCase()}`} />
+        <div className="scroll-x">
+          <div className="week-board">
+            {days.map(({ label, d, k }) => {
+              const list = tasks.filter(t => t.day === k);
+              return (
+                <div key={k} className={'day' + (k === dayKey() ? ' today' : '')}>
+                  <h4><span className="d1">{label}</span><span className="d2">{d.getDate()}{k === dayKey() ? ' · today' : ''}</span></h4>
+                  <ul><AnimatePresence initial={false}>{list.map(t => <TaskItem key={t.id} task={t} />)}</AnimatePresence></ul>
+                  <AddTask day={k} id={'add-' + k} placeholder="add…" />
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </section>
+      <section className="grid gap-12 md:grid-cols-[minmax(0,1fr)_minmax(0,1.3fr)] min-w-0">
+        <div>
+          <SectionHead title="study log" meta={s.sample ? 'includes sample week' : undefined} />
+          <div className="grid grid-cols-3 gap-6">
+            <div><div className="bigstat">{fmtMin(s.weekTotal)}</div><div className="mono-s mt-2">this week</div></div>
+            <div><div className="bigstat">{s.streak}</div><div className="mono-s mt-2">day streak</div></div>
+            <div><div className="bigstat">{best.min ? best.label : '—'}</div><div className="mono-s mt-2">best day</div></div>
+          </div>
+          <div className="mt-10"><Streak /></div>
+        </div>
+        <div>
+          <SectionHead title="recent sessions" />
+          {recent.map(h => (
+            <div key={h.id} className="logrow">
+              <span className="a">{new Date(h.at).toLocaleDateString('en', { weekday: 'short', day: 'numeric' }).toLowerCase()} · {new Date(h.at).toLocaleTimeString('en', { hour: 'numeric', minute: '2-digit' }).toLowerCase()}</span>
+              <span className="italic text-cream/75">focus{h.sample ? ' · sample' : ''}</span>
+              <span className="m">{h.minutes}m</span>
+            </div>
+          ))}
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function Footer() {
+  const { grain, setGrain, resetSamples, setHistory } = useApp();
+  const [armed, setArmed] = useState(false);
+  return (
+    <footer className="foot">
+      <span className="sig">slaveaway<span className="text-rose">.</span> <span className="mono-s">vol. 1 · prototype</span></span>
+      <span className="mono-s">sample data · saved in this browser only</span>
+      <button className="link" onClick={() => setGrain(g => !g)}>film grain {grain ? 'on' : 'off'}</button>
+      <button className="link" onClick={() => setHistory(h => h.filter(x => !x.sample))}>clear sample week</button>
+      {armed
+        ? <button className="link" onClick={() => { resetSamples(); setArmed(false); }}>confirm reset</button>
+        : <button className="link" onClick={() => setArmed(true)}>reset sample data</button>}
+    </footer>
+  );
+}
+
+function Shell() {
+  const { page } = useApp();
+  useEffect(() => {
+    const f = () => { const h = location.hash.slice(1); if (PAGES.includes(h)) window.dispatchEvent(new CustomEvent('sa-go', { detail: h })); };
+    window.addEventListener('hashchange', f);
+    return () => window.removeEventListener('hashchange', f);
+  }, []);
+  return (
+    <>
+      <Header />
+      <div className="wrap">
+        <AnimatePresence mode="wait" initial={false}>
+          <motion.main key={page} className="page"
+            initial={{ opacity: 0, y: 10, filter: 'blur(6px)' }} animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }} exit={{ opacity: 0, y: -6, filter: 'blur(4px)' }}
+            transition={{ duration: .4, ease: EASE }}>
+            {page === 'home' && <Home />}
+            {page === 'focus' && <FocusPage />}
+            {page === 'music' && <MusicPage />}
+            {page === 'ai' && <AIPage />}
+            {page === 'planner' && <PlannerPage />}
+          </motion.main>
+        </AnimatePresence>
+        <Footer />
+      </div>
+      <Grain />
+    </>
+  );
+}
+function HashBridge() {
+  const { go } = useApp();
+  useEffect(() => { const f = e => go(e.detail); window.addEventListener('sa-go', f); return () => window.removeEventListener('sa-go', f); }, []);
+  return null;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<AppProvider><HashBridge /><Shell /></AppProvider>);
+</script>
