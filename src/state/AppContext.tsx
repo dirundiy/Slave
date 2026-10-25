@@ -4,7 +4,7 @@ import { usePersist } from '../lib/storage';
 import { addDays, dayKey, DOW, mmss, uid, weekStart } from '../lib/util';
 import { MODE_LABEL, useTimer, type Timer } from './useTimer';
 
-export const PAGES = ['home', 'planner', 'study', 'chat'] as const;
+export const PAGES = ['home', 'planner'] as const;
 export type Page = (typeof PAGES)[number];
 
 type Setter<T> = Dispatch<SetStateAction<T>>;

@@ -1,7 +1,7 @@
 import { motion } from 'framer-motion';
 import { PAGES, useApp, type Page } from '../state/AppContext';
 
-const NAV_LABEL: Record<Page, string> = { home: 'timer', planner: 'planner', study: 'study', chat: 'chat' };
+const NAV_LABEL: Record<Page, string> = { home: 'timer', planner: 'planner' };
 
 export function Header() {
   const { page, go } = useApp();
