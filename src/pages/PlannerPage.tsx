@@ -1,37 +1,20 @@
 import { useApp, useStats } from '../state/AppContext';
-import { addDays, dayKey, DOW, fmtMin, monthShort, weekStart } from '../lib/util';
+import { DOW, fmtMin } from '../lib/util';
 import { Label, PageTitle } from '../components/Label';
-import { TaskList } from '../components/Tasks';
 import { Week } from '../components/Streak';
 import { SaveBar } from '../components/SaveBar';
+import { Calendar } from '../components/Calendar';
 
 export function PlannerPage() {
   const { history } = useApp();
   const s = useStats();
-  const ws = weekStart();
-  const today = dayKey();
   const recent = [...history].sort((a, b) => b.at.localeCompare(a.at)).slice(0, 6);
-  const end = addDays(ws, 6);
 
   return (
     <>
       <PageTitle>planner</PageTitle>
       <SaveBar />
-      <Label action={<span className="faint">{ws.getDate()} {monthShort(ws)} – {end.getDate()} {monthShort(end)}</span>}>this week</Label>
-      <div className="scroll-x">
-        <div className="week-board">
-          {DOW.map((label, i) => {
-            const d = addDays(ws, i);
-            const k = dayKey(d);
-            return (
-              <div key={k} className={`day${k === today ? ' today' : ''}`}>
-                <h4><span className="d1">{label}</span><span className="d2">{d.getDate()}</span></h4>
-                <TaskList day={k} idPrefix="planner" />
-              </div>
-            );
-          })}
-        </div>
-      </div>
+      <Calendar />
 
       <div className="two-col mt-20">
         <section>

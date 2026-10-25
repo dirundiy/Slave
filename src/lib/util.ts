@@ -14,8 +14,9 @@ export const addDays = (d: Date, n: number) => {
   x.setDate(x.getDate() + n);
   return x;
 };
-export const weekStart = () => {
-  const d = new Date();
+/** Monday of the week containing `from` (default today), at midnight. */
+export const weekStart = (from: Date = new Date()) => {
+  const d = new Date(from);
   d.setHours(0, 0, 0, 0);
   return addDays(d, -((d.getDay() + 6) % 7));
 };
