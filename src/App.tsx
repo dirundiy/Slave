@@ -4,8 +4,10 @@ import { EASE } from './lib/util';
 import { Footer, Header } from './components/Header';
 import { Home } from './pages/Home';
 import { PlannerPage } from './pages/PlannerPage';
+import { StudyPage } from './pages/StudyPage';
+import { ChatPage } from './pages/ChatPage';
 
-const VIEWS = { home: Home, planner: PlannerPage };
+const VIEWS = { home: Home, planner: PlannerPage, study: StudyPage, chat: ChatPage };
 
 export default function App() {
   const { page, grain } = useApp();

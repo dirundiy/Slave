@@ -52,7 +52,7 @@ export function SaveBar() {
       if (data.settings) setSettings(data.settings);
       setMsg(`Restored ${data.tasks.length} tasks and ${data.history.length} sessions.`);
     } catch {
-      setMsg('That file isn’t a slave. backup. Pick a file saved with “save backup”.');
+      setMsg('That file isn’t a slave backup. Pick a file saved with “save backup”.');
     }
   };
 
